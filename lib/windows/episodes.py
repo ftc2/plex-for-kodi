@@ -32,10 +32,11 @@ VIDEO_RELOAD_KW = dict(includeExtras=1, includeExtrasCount=10, includeChapters=1
 
 
 class EpisodeReloadTask(backgroundthread.Task):
-    def setup(self, episode, callback, with_progress=False):
+    def setup(self, episode, callback, with_progress=False, set_item_info=False):
         self.episode = episode
         self.callback = callback
         self.withProgress = with_progress
+        self.setItemInfo = set_item_info
         return self
 
     def run(self):
@@ -50,7 +51,7 @@ class EpisodeReloadTask(backgroundthread.Task):
             self.episode.reload(checkFiles=1, includeChapters=1, fromMediaChoice=self.episode.mediaChoice is not None)
             if self.isCanceled():
                 return
-            self.callback(self, self.episode, with_progress=self.withProgress)
+            self.callback(self, self.episode, with_progress=self.withProgress, set_item_info=self.setItemInfo)
         except requests.exceptions.RequestException:
             raise util.NoDataException
         except:
@@ -371,17 +372,22 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
         skip_progress_for = None
         if vp:
             skip_progress_for = []
+            break_next = False
             for m in self.episodeListControl:
                 # pagination boundary
                 if not m.dataSource:
                     continue
 
-                if m.dataSource.ratingKey in vp:
+                if m.dataSource.ratingKey in vp or break_next:
                     reload_items.append(m)
-                    skip_progress_for.append(m.dataSource.ratingKey)
-                    del vp[m.dataSource.ratingKey]
+                    if not break_next:
+                        skip_progress_for.append(m.dataSource.ratingKey)
+                        del vp[m.dataSource.ratingKey]
+                    else:
+                        break
                 if not vp:
-                    break
+                    # for multi-episode videos reload the next one after this progress event as well
+                    break_next = True
 
         reload_items = list(set(reload_items))
         #select_episode = reload_items and reload_items[-1] or mli
@@ -389,7 +395,8 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
         #self.episodesPaginator.setEpisode(select_episode.dataSource)
         if not reload_items:
             self.selectPlayButton()
-        self.reloadItems(items=reload_items, with_progress=True, skip_progress_for=skip_progress_for)
+        self.reloadItems(items=reload_items, with_progress=True, skip_progress_for=skip_progress_for,
+                         set_item_info=True)
         self.fillSeasons(self.show_, seasonsFilter=lambda x: len(x) > 1, selectSeason=self.season, update=True,
                          do_focus=not self.manuallySelectedSeason)
         self.fillRelated()
@@ -1172,7 +1179,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
 
         if action in (xbmcgui.ACTION_MOVE_RIGHT, xbmcgui.ACTION_MOVE_LEFT) and lastItem:
             items = self.episodesPaginator.wrap(mli, lastItem, action)
-            xbmc.sleep(100)
+            #xbmc.sleep(100)
             mli = self.episodeListControl.getSelectedItem()
             if items:
                 self.reloadItems(items)
@@ -1391,7 +1398,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
             self.selectEpisode()
         self.reloadItems(items, with_progress=True)
 
-    def reloadItems(self, items, with_progress=False, skip_progress_for=None):
+    def reloadItems(self, items, with_progress=False, skip_progress_for=None, set_item_info=False):
         tasks = []
         for mli in items:
             if not mli.dataSource:
@@ -1401,7 +1408,8 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
             if skip_progress_for:
                 item_progress = False if mli.dataSource.ratingKey in skip_progress_for else with_progress
 
-            task = EpisodeReloadTask().setup(mli.dataSource, self.reloadItemCallback, with_progress=item_progress)
+            task = EpisodeReloadTask().setup(mli.dataSource, self.reloadItemCallback, with_progress=item_progress,
+                                             set_item_info=set_item_info)
             self.tasks.add(task)
             tasks.append(task)
 
@@ -1410,7 +1418,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
     def getPlayButtonID(self, mli, base=None):
         return (base and base or self.PLAY_BUTTON_ID) + (mli.getProperty('media.multiple') and 1000 or 0)
 
-    def reloadItemCallback(self, task, episode, with_progress=False):
+    def reloadItemCallback(self, task, episode, with_progress=False, set_item_info=False):
         self.tasks.remove(task)
         del task
 
@@ -1426,6 +1434,8 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
 
                 try:
                     self.setPostReloadItemInfo(episode, mli)
+                    if set_item_info:
+                        self.setUserItemInfo(mli)
                 except:
                     util.ERROR("No data - disconnected?", notify=True, time_ms=5000)
                     self.doClose()
