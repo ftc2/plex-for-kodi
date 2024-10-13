@@ -175,6 +175,41 @@ def setItemType(type_=None):
     ITEM_TYPE = type_
     util.setGlobalProperty('item.type', str(ITEM_TYPE))
 
+class CreateDefaultItemsTask(backgroundthread.Task):
+    def setup(self, startPos, count, totalSize, fallback, callback, key=None):
+        self.startPos = startPos
+        self.count = count
+        self.totalSize = totalSize
+        self.endPos = self.startPos + self.count
+        if self.endPos > self.totalSize:
+            self.endPos = self.totalSize
+        self.fallback = fallback
+        self.callback = callback
+        self.key = key
+        return self
+
+    def contains(self, pos):
+        return self.startPos <= pos < self.endPos
+
+    def run(self):
+        if self.isCanceled():
+            return
+
+        items = []
+        try:
+            firstMli = None
+            for x in range(self.startPos, self.endPos):
+                mli = kodigui.ManagedListItem('')
+                mli.setProperty('thumb.fallback', self.fallback)
+                mli.setProperty('index', str(x))
+                if self.key:
+                    mli.setProperty('key', self.key)
+                    if x == self.startPos:  # i.e. first item
+                        firstMli = mli
+                items.append(mli)
+            self.callback(items, self.key, firstMli)
+        except plexnet.exceptions.BadRequest:
+            util.DEBUG_LOG('404 on default items')
 
 class ChunkRequestTask(backgroundthread.Task):
     def setup(self, section, start, size, callback, filter_=None, sort=None, unwatched=False, subDir=False):
@@ -320,6 +355,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
     # so that we fill an entire row
     CHUNK_SIZE = 240
     CHUNK_OVERCOMMIT = 6
+    DEFAULT_ITEMS_CHUNK_SIZE = 500
 
     def __init__(self, *args, **kwargs):
         PlaybackBtnMixin.__init__(self)
@@ -1104,7 +1140,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
         elif ITEM_TYPE == 'track':
             type_ = 10
 
-        idx = 0
+        tasks = []
         fallback = 'script.plex/thumb_fallbacks/{0}.png'.format(TYPE_KEYS.get(self.section.type, TYPE_KEYS['movie'])['fallback'])
 
         if self.sort != 'titleSort' or ITEM_TYPE in ('folder', 'episode') or self.subDir or self.section.TYPE == "collection":
@@ -1124,11 +1160,8 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                 else:
                     self.setBoolProperty('no.content', True)
             else:
-                for x in range(totalSize):
-                    mli = kodigui.ManagedListItem('')
-                    mli.setProperty('thumb.fallback', fallback)
-                    mli.setProperty('index', str(x))
-                    items.append(mli)
+                for startPosition in range(0, totalSize, self.DEFAULT_ITEMS_CHUNK_SIZE):
+                    tasks.append(CreateDefaultItemsTask().setup(startPosition, self.DEFAULT_ITEMS_CHUNK_SIZE, totalSize, fallback, self._defaultItemsCallback))
         else:
             jumpList = self.section.jumpList(filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, type_=type_)
 
@@ -1146,6 +1179,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
                 return
 
+            idx = 0
             for kidx, ji in enumerate(jumpList):
                 mli = kodigui.ManagedListItem(ji.title, data_source=ji.key)
                 mli.setProperty('key', ji.key)
@@ -1154,15 +1188,8 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                 jitems.append(mli)
                 totalSize += ji.size.asInt()
 
-                for x in range(ji.size.asInt()):
-                    mli = kodigui.ManagedListItem('')
-                    mli.setProperty('key', ji.key)
-                    mli.setProperty('thumb.fallback', fallback)
-                    mli.setProperty('index', str(idx))
-                    items.append(mli)
-                    if not x:  # i.e. first item
-                        self.firstOfKeyItems[ji.key] = mli
-                    idx += 1
+                tasks.append(CreateDefaultItemsTask().setup(idx, ji.size.asInt(), totalSize, fallback, self._defaultItemsCallback, key=ji.key))
+                idx += ji.size.asInt()
 
             util.setGlobalProperty('key', jumpList[0].key)
 
@@ -1171,7 +1198,14 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
         self.showPanelControl.reset()
         self.keyListControl.reset()
 
-        self.showPanelControl.addItems(items)
+        # Start the background tasks to create the default items
+        self.tasks.add(tasks)
+        backgroundthread.BGThreader.addTasksToFront(tasks)
+
+        # Wait for the default items to be created
+        while backgroundthread.BGThreader.working() and not util.MONITOR.abortRequested():
+            util.MONITOR.waitForAbort(0.1)
+
         self.keyListControl.addItems(jitems)
 
         self.showPanelControl.selectItem(0)
@@ -1314,6 +1348,28 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
         if keys:
             util.setGlobalProperty('key', keys[0])
+
+    def _defaultItemsCallback(self, items, key, firstMli):
+        if not items:
+            return
+
+        while True:
+            self.lock.acquire()
+            # When creating the default items for the title sort we need to add them to the list
+            # in order.  So we look at the first index of the incomming items to see if it's the
+            # next batch of items to add.  If not then it releases the lock and adds a small delay
+            # so that other threads can grab the lock.
+            if key and firstMli:
+                if int(firstMli.getProperty('index')) != self.showPanelControl.size():
+                    self.lock.release()
+                    xbmc.sleep(1)
+                    continue
+
+                self.firstOfKeyItems[key] = firstMli
+
+            self.showPanelControl.addItems(items)
+            self.lock.release()
+            break
 
     def _chunkCallback(self, items, start):
         if not self.showPanelControl or not items:
