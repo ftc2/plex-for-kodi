@@ -196,20 +196,17 @@ class CreateDefaultItemsTask(backgroundthread.Task):
             return
 
         items = []
-        try:
-            firstMli = None
-            for x in range(self.startPos, self.endPos):
-                mli = kodigui.ManagedListItem('')
-                mli.setProperty('thumb.fallback', self.fallback)
-                mli.setProperty('index', str(x))
-                if self.key:
-                    mli.setProperty('key', self.key)
-                    if x == self.startPos:  # i.e. first item
-                        firstMli = mli
-                items.append(mli)
-            self.callback(items, self.key, firstMli)
-        except plexnet.exceptions.BadRequest:
-            util.DEBUG_LOG('404 on default items')
+        firstMli = None
+        for x in range(self.startPos, self.endPos):
+            mli = kodigui.ManagedListItem('')
+            mli.setProperty('thumb.fallback', self.fallback)
+            mli.setProperty('index', str(x))
+            if self.key:
+                mli.setProperty('key', self.key)
+                if x == self.startPos:  # i.e. first item
+                    firstMli = mli
+            items.append(mli)
+        self.callback(items, self.key, firstMli)
 
 class ChunkRequestTask(backgroundthread.Task):
     def setup(self, section, start, size, callback, filter_=None, sort=None, unwatched=False, subDir=False):
@@ -355,7 +352,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
     # so that we fill an entire row
     CHUNK_SIZE = 240
     CHUNK_OVERCOMMIT = 6
-    DEFAULT_ITEMS_CHUNK_SIZE = 500
+    DEFAULT_ITEMS_CHUNK_SIZE = 250
 
     def __init__(self, *args, **kwargs):
         PlaybackBtnMixin.__init__(self)
