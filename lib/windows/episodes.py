@@ -447,7 +447,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
         self.fillRoles(hasPrev)
 
     def selectEpisode(self, from_reinit=False):
-        util.DEBUG_LOG("SelectEpisode called: {}, {}, {}, {}", from_reinit, self.episode, self.season,
+        util.DEBUG_LOG("SelectEpisode called: {}, {}, {}, {}, {}, {}", from_reinit, self.episode, self.season,
                        self.show_, VIDEO_PROGRESS, self.cameFrom)
         if not self.episodesPaginator:
             return
@@ -530,11 +530,11 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
                    (had_progress_data and not progress_data_left and ((not just_fully_watched
                     and not mli.dataSource.isFullyWatched) or (just_fully_watched and is_last_mli))) or \
                    ((not had_progress_data or not from_reinit) and not self.episode and not mli.dataSource.isFullyWatched):
-                    if self.episodeListControl.getSelectedPosition() < mli.pos():
-                        self.episodeListControl.selectItem(mli.pos())
-                        self.episodesPaginator.setEpisode(self.episode or mli.dataSource)
-                        self.lastItem = mli
-                        selected_new = True
+                    #if self.episodeListControl.getSelectedPosition() < mli.pos():
+                    self.episodeListControl.selectItem(mli.pos())
+                    self.episodesPaginator.setEpisode(self.episode or mli.dataSource)
+                    self.lastItem = mli
+                    selected_new = True
                     if just_fully_watched:
                         set_main_progress_to = 0
 
