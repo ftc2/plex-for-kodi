@@ -300,6 +300,16 @@ class MediaDecisionEngine(object):
             util.LOG("MDE: (DP) Codec is VC1, which is disabled")
             return False
 
+        # HDR
+        if item.settings.getPreference('disable_hdr', False):
+            if choice.videoStream.DOVIProfile == "8" and choice.videoStream.DOVIBLCompatID == "1" or \
+                choice.videoStream.DOVIProfile == "8" and choice.videoStream.DOVIBLCompatID == "4" or \
+                choice.videoStream.DOVIProfile == "7" or \
+                choice.videoStream.colorTrc in ("smpte2084", "arib-std-b67"):
+                choice.forceTranscode = True
+                choice.sorts.videoDS = 0
+                return False
+
         return True
 
         # container = choice.media.get('container')

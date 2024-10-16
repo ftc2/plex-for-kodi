@@ -456,6 +456,11 @@ class Settings(object):
                     desc_ds=T(32979, ''),
                     feature_4k=T(32036, ''),
                     desc_4k=T(32102, ''))),
+                BoolSetting(
+                    'disable_hdr', T(33660, 'Disable HDR'), False
+                ).description(T(33661, "If you don't want your client to handle HDR (or HDR-fallback), "
+                                       "enable this to force transcoding. Doesn't apply to DV Profile 5.")
+                ),
                 MultiOptionsSetting(
                     'allowed_codecs', T(33059, ''),
                     ["allow_hevc", "allow_vc1"],

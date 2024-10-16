@@ -161,7 +161,7 @@ class PlexStream(plexobjects.PlexObject, AudioCodecMixin):
         elif self.DOVIProfile == "8" and self.DOVIBLCompatID == "4":
             render = "dv p8.4/hlg"
         elif self.DOVIProfile == "7":
-            render = "dv p7"
+            render = "dv p7/hdr"
         elif self.DOVIProfile == "5":
             render = "dv p5"
         elif self.DOVIProfile:

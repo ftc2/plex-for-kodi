@@ -2890,3 +2890,11 @@ msgstr "Auto-Sync deakt."
 msgctxt "#33659"
 msgid "Hide hub: {}"
 msgstr "Hub verstecken: {}"
+
+msgctxt "#33660"
+msgid "Disable HDR"
+msgstr "HDR deaktivieren"
+
+msgctxt "#33661"
+msgid "If you don't want your client to handle HDR (or HDR-fallback), enable this to force transcoding. Doesn't apply to DV Profile 5."
+msgstr "Wenn Dein Client HDR (oder HDR-Fallback) nicht abspielen soll, aktivieren um Transkodieren zu forcieren. Wird bei DV Profil 5 nicht angewandt."

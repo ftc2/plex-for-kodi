@@ -2299,3 +2299,11 @@ msgstr ""
 msgctxt "#33659"
 msgid "Hide hub: {}"
 msgstr ""
+
+msgctxt "#33660"
+msgid "Disable HDR"
+msgstr ""
+
+msgctxt "#33661"
+msgid "If you don't want your client to handle HDR (or HDR-fallback), enable this to force transcoding. Doesn't apply to DV Profile 5."
+msgstr ""

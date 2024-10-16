@@ -541,6 +541,12 @@ class PlexPlayer(BasePlayer):
                 "append-transcode-target-codec(type=videoProfile&context=streaming&container=mkv&"
                 "protocol=http&videoCodec=vc1)")
 
+        if self.item.settings.getPreference("disable_hdr", False):
+            builder.extras.append(
+                "add-limitation(scope=videoTranscodeTarget&scopeName=*&scopeType=videoCodec&context=streaming&protocol=http&"
+                "type=match&name=video.colorTrc&list=bt709|bt470m|bt470bg|smpte170m|smpte240m|bt2020-10|bt2020-10"
+                "&isRequired=true)")
+
         return builder
 
     def buildDirectPlay(self, obj, partIndex):
