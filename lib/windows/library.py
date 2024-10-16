@@ -353,6 +353,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
     CHUNK_SIZE = 240
     CHUNK_OVERCOMMIT = 6
     DEFAULT_ITEMS_CHUNK_SIZE = 250
+    DEFAULT_ITEMS_CHUNK_SIZE_BIG = 500
 
     def __init__(self, *args, **kwargs):
         PlaybackBtnMixin.__init__(self)
@@ -1115,10 +1116,15 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
         return (self.sort, self.sortDesc and 'desc' or 'asc')
 
+
+    def getDefChunkSize(self, size):
+        return self.DEFAULT_ITEMS_CHUNK_SIZE if size < 1000 else self.DEFAULT_ITEMS_CHUNK_SIZE_BIG
+
     @busy.dialog()
     def fillShows(self):
         self.setBoolProperty('no.content', False)
         self.setBoolProperty('no.content.filtered', False)
+        self.setBoolProperty('content.filling', True)
         items = []
         jitems = []
         self.keyItems = {}
@@ -1157,8 +1163,8 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                 else:
                     self.setBoolProperty('no.content', True)
             else:
-                for startPosition in range(0, totalSize, self.DEFAULT_ITEMS_CHUNK_SIZE):
-                    tasks.append(CreateDefaultItemsTask().setup(startPosition, self.DEFAULT_ITEMS_CHUNK_SIZE, totalSize, fallback, self._defaultItemsCallback))
+                for startPosition in range(0, totalSize, self.getDefChunkSize(totalSize)):
+                    tasks.append(CreateDefaultItemsTask().setup(startPosition, self.getDefChunkSize(totalSize), totalSize, fallback, self._defaultItemsCallback))
         else:
             jumpList = self.section.jumpList(filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, type_=type_)
 
@@ -1178,15 +1184,16 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
             idx = 0
             for kidx, ji in enumerate(jumpList):
+                ji_size = ji.size.asInt()
                 mli = kodigui.ManagedListItem(ji.title, data_source=ji.key)
                 mli.setProperty('key', ji.key)
                 mli.setProperty('original', '{0:02d}'.format(kidx))
                 self.keyItems[ji.key] = mli
                 jitems.append(mli)
-                totalSize += ji.size.asInt()
+                totalSize += ji_size
 
                 tasks.append(CreateDefaultItemsTask().setup(idx, ji.size.asInt(), totalSize, fallback, self._defaultItemsCallback, key=ji.key))
-                idx += ji.size.asInt()
+                idx += ji_size
 
             util.setGlobalProperty('key', jumpList[0].key)
 
@@ -1210,9 +1217,12 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
         tasks = []
         for startChunkPosition in range(0, totalSize, self.CHUNK_SIZE):
+            # fixme: this is a workaround so we don't error out when firstCharacter and /all item count differ
+            # this might hide items
+            chunkEnd = totalSize if totalSize < self.CHUNK_SIZE else self.CHUNK_SIZE
             tasks.append(
                 ChunkRequestTask().setup(
-                    self.section, startChunkPosition, self.CHUNK_SIZE, self._chunkCallback, filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, subDir=self.subDir
+                    self.section, startChunkPosition, chunkEnd, self._chunkCallback, filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, subDir=self.subDir
                 )
             )
 
@@ -1353,7 +1363,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
         while True:
             self.lock.acquire()
             # When creating the default items for the title sort we need to add them to the list
-            # in order.  So we look at the first index of the incomming items to see if it's the
+            # in order.  So we look at the first index of the incoming items to see if it's the
             # next batch of items to add.  If not then it releases the lock and adds a small delay
             # so that other threads can grab the lock.
             if key and firstMli:
@@ -1379,11 +1389,11 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
             thumbDim = TYPE_KEYS.get(self.section.type, TYPE_KEYS['movie'])['thumb_dim']
             artDim = TYPE_KEYS.get(self.section.type, TYPE_KEYS['movie']).get('art_dim', (256, 256))
 
+            if not self.showPanelControl:
+                return
+
             if ITEM_TYPE == 'episode':
                 for offset, obj in enumerate(items):
-                    if not self.showPanelControl:
-                        return
-
                     mli = self.showPanelControl[pos]
                     if obj:
                         mli.dataSource = obj
@@ -1418,9 +1428,6 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
             elif ITEM_TYPE == 'album':
                 for offset, obj in enumerate(items):
-                    if not self.showPanelControl:
-                        return
-
                     mli = self.showPanelControl[pos]
                     if obj:
                         mli.dataSource = obj
@@ -1442,8 +1449,6 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                     pos += 1
             else:
                 for offset, obj in enumerate(items):
-                    if not self.showPanelControl:
-                        return
 
                     mli = self.showPanelControl[pos]
                     if obj:
@@ -1489,6 +1494,8 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                             mli.setProperty('index', '')
 
                     pos += 1
+
+        self.setBoolProperty('content.filling', False)
 
     def requestChunk(self, start):
         if util.addonSettings.retrieveAllMediaUpFront:

@@ -255,7 +255,7 @@ class LibrarySection(plexobjects.PlexObject):
                 args['unwatchedLeaves'] = 1
 
         if args:
-            path += util.joinArgs(args)
+            path += util.joinArgs(args, '?' not in path)
 
         try:
             return plexobjects.listItems(self.server, path, bytag=True)
