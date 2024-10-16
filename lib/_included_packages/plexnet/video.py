@@ -422,6 +422,7 @@ class PlayableVideo(Video, media.RelatedMixin):
         """
         Reset cached streams after setting a mediaChoice
         """
+        self._current_subtitle_idx = None
         super(PlayableVideo, self).setMediaChoice(*args, **kwargs)
         self.resetStreams()
 
