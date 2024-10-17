@@ -2064,7 +2064,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
 
         if not hub.items and not hubitems:
             control.reset()
-            if self.lastFocusID == index + 400:
+            if self.lastFocusID == index + 400 and not self._anyItemAction:
                 util.DEBUG_LOG("Hub {} was focused but is gone.", identifier)
                 hubControlIndex = self.lastFocusID - 400
                 self.focusFirstValidHub(hubControlIndex)
