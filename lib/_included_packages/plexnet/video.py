@@ -270,6 +270,13 @@ class Video(media.MediaItem, AudioCodecMixin):
         self.server.query(path)
         self.reload(**kwargs)
 
+    def removeFromContinueWatching(self, **kwargs):
+        path = '/actions/removeFromContinueWatching?ratingKey={}'.format(self.ratingKey)
+        self.server.query(path, method=self.server.session.put)
+        self.reload(**kwargs)
+
+    removeCW = removeFromContinueWatching
+
     # def play(self, client):
     #     client.playMedia(self)
 

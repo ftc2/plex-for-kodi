@@ -1408,6 +1408,14 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             else:
                 options.append({'key': 'mark_unwatched', 'display': T(32318, "Mark Unplayed")})
 
+            if (mli.dataSource.TYPE in ('episode', 'movie') and
+                    #hub.hubIdentifier == "continueWatching"):
+                    hub.hubIdentifier in ("home.continue", "continueWatching", "home.ondeck")):
+                # allow removing items from CW
+                options.append(dropdown.SEPARATOR)
+                options.append({'key': 'remove_cw', 'display': T(33662, "Remove from Continue Watching")})
+
+
         choice = dropdown.showDropdown(
             options,
             pos=(660, 441),
@@ -1448,6 +1456,21 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             elif choice["key"] == "mark_unwatched":
                 mli.dataSource.markUnwatched()
                 self._updateOnDeckHubs()
+
+        elif choice["key"] == "remove_cw":
+            button = optionsdialog.show(
+                T(33662, "Remove from Continue Watching"),
+                u"{} {}".format(mli.label, mli.label2),
+                T(32328, 'Yes'),
+                T(32329, 'No'),
+                dialog_props=self.carriedProps
+            )
+
+            if button != 0:
+                return
+
+            mli.dataSource.removeFromContinueWatching()
+            self._updateOnDeckHubs()
 
     def sectionMover(self, item, action):
         def stop_moving(reset=False):
