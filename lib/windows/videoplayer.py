@@ -528,7 +528,7 @@ class VideoPlayerWindow(kodigui.ControlledWindow, windowutils.UtilMixin, Spoiler
             elif self.timeout is not None:
                 cd = min(abs(util.addonSettings.postplayTimeout - 1), int((self.timeout or now) - now))
                 base = 15 / float(util.addonSettings.postplayTimeout - 1)
-                self.setProperty('countdown', str(int(math.ceil(base*cd))))
+                self.setProperty('countdown', str(15 - int(math.ceil(base*cd))))
 
     def getHubs(self):
         try:
