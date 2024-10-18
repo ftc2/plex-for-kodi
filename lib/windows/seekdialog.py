@@ -529,9 +529,8 @@ class SeekDialog(kodigui.BaseDialog):
             self.timeFmtKodi = self.timeFmtKodi.replace("hh:", "")
         self._ignoreTick = False
         self._ignoreInput = False
-        if not self.showChapters:
-            self.bifURL = bif_url
-            self.hasBif = bool(self.bifURL)
+        self.bifURL = bif_url
+        self.hasBif = bool(self.bifURL)
 
         if self.hasBif:
             self.baseURL = re.sub(r'/\d+\?', '/{0}?', self.bifURL)
@@ -636,11 +635,13 @@ class SeekDialog(kodigui.BaseDialog):
                     # we're seeking from the timeline with the OSD open - do an actual timeline seek
 
                     if action in (xbmcgui.ACTION_MOVE_RIGHT, xbmcgui.ACTION_STEP_FORWARD):
+                        self.setProperty('show.chapters', '')
                         if self.useDynamicStepsForTimeline:
                             return self.skipForward()
                         return self.seekByOffset(10000, auto_seek=self.useAutoSeek)
 
                     elif action in (xbmcgui.ACTION_MOVE_LEFT, xbmcgui.ACTION_STEP_BACK):
+                        self.setProperty('show.chapters', '')
                         if self.useDynamicStepsForTimeline:
                             return self.skipBack()
                         return self.seekByOffset(-10000, auto_seek=self.useAutoSeek)
@@ -1822,7 +1823,12 @@ class SeekDialog(kodigui.BaseDialog):
             return
 
         if self.hasBif:
-            self.setProperty('bif.image', self.handler.player.playerObject.getBifUrl(offset))
+            bifUrl = self.handler.player.playerObject.getBifUrl(offset)
+            if "blur_chapters" in self.no_spoilers:
+                bifUrl = self.player.video.server.getImageTranscodeURL(bifUrl,
+                                                                       *PlaylistDialog.LI_AR16X9_THUMB_DIM,
+                                                                       **{"blur": util.addonSettings.episodeNoSpoilerBlur})
+            self.setProperty('bif.image', bifUrl)
             self.bifImageControl.setPosition(bifx, 752)
 
         self.seekbarControl.setPosition(0, self.seekbarControl.getPosition()[1])

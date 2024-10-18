@@ -432,7 +432,7 @@
     <visible>!String.IsEmpty(Window.Property(show.OSD)) + !Window.IsVisible(osdvideosettings) + !Window.IsVisible(osdaudiosettings) + !Window.IsVisible(osdsubtitlesettings) + !Window.IsVisible(subtitlesearch) + !Window.IsActive(playerprocessinfo) + !Window.IsActive(selectdialog) + !Window.IsVisible(osdcmssettings)</visible>
     <animation effect="fade" time="200" delay="200" end="0">Hidden</animation>
     <control type="group" id="300">
-        <visible>!String.IsEmpty(Window.Property(has.bif)) + [Control.HasFocus(100) | Control.HasFocus(501) | !String.IsEmpty(Window.Property(button.seek))]</visible>
+        <visible>!String.IsEmpty(Window.Property(has.bif)) + String.IsEmpty(Window.Property(show.chapters) + [Control.HasFocus(100) | Control.HasFocus(501) | !String.IsEmpty(Window.Property(button.seek))]</visible>
         <animation effect="fade" time="100" delay="100" end="100">Visible</animation>
         <posx>0</posx>
         <posy>752</posy>
