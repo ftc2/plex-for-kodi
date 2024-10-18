@@ -136,6 +136,7 @@ class SeekDialog(kodigui.BaseDialog):
 
     HIDE_DELAY = 4  # This uses the Cron tick so is +/- 1 second accurate
     OSD_HIDE_ANIMATION_DURATION = 0.2
+    OSD_HIDE_ACTION_THRESHOLD = 0.5
     SKIP_STEPS = {"negative": [-10000], "positive": [30000]}
 
     def __init__(self, *args, **kwargs):
@@ -634,6 +635,11 @@ class SeekDialog(kodigui.BaseDialog):
                 if controlID == self.MAIN_BUTTON_ID:
                     # we're seeking from the timeline with the OSD open - do an actual timeline seek
 
+                    # ignore seek actions for a split second when the OSD is hiding or was hiding
+                    if (action.getId() in KEY_MOVE_SET and self._osdHideAnimationTimeout and
+                            self._osdHideAnimationTimeout + self.OSD_HIDE_ACTION_THRESHOLD >= time.time()):
+                        return
+
                     if action in (xbmcgui.ACTION_MOVE_RIGHT, xbmcgui.ACTION_STEP_FORWARD):
                         self.setProperty('show.chapters', '')
                         if self.useDynamicStepsForTimeline:
@@ -680,6 +686,11 @@ class SeekDialog(kodigui.BaseDialog):
                     self.resetSeeking()
 
                 elif controlID == self.NO_OSD_BUTTON_ID or passThroughMain:
+                    # ignore seek actions for a split second when the OSD is hiding or was hiding
+                    if (action.getId() in KEY_MOVE_SET and self._osdHideAnimationTimeout and
+                            self._osdHideAnimationTimeout + self.OSD_HIDE_ACTION_THRESHOLD >= time.time()):
+                        return
+
                     if action in (xbmcgui.ACTION_MOVE_RIGHT, xbmcgui.ACTION_MOVE_LEFT):
                         # we're seeking from the timeline, with the OSD closed; act as we're skipping
                         if not self._seeking:
