@@ -417,7 +417,7 @@ class ShowWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMixin, 
         if self.playBtnClicked:
             return
 
-        items = self.mediaItem.all()
+        items = self.mediaItem.all(unwatched=True)
         pl = playlist.LocalPlaylist(items, self.mediaItem.getServer())
         resume = False
         if not shuffle and self.mediaItem.type == 'show':

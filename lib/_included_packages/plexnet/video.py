@@ -637,7 +637,11 @@ class Show(Video, media.RelatedMixin, SectionOnDeckMixin):
         path = '/library/metadata/%s/allLeaves' % self.ratingKey
         return plexobjects.findItem(self.server, path, title)
 
-    def all(self, *args, **kwargs):
+    def all(self, unwatched=False, *args, **kwargs):
+        if unwatched:
+            eps = self.episodes(watched=False)
+            if eps:
+                return eps
         return self.episodes()
 
     def watched(self):
