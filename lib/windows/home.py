@@ -1438,16 +1438,17 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             return self.lastSection
 
         elif choice["key"] in ("mark_watched", "mark_unwatched"):
-            button = optionsdialog.show(
-                T(32319, "Mark Played") if choice["key"] == "mark_watched" else T(32318, "Mark Unplayed"),
-                u"{} {}".format(mli.label, mli.label2),
-                T(32328, 'Yes'),
-                T(32329, 'No'),
-                dialog_props=self.carriedProps
-            )
+            if util.getSetting('home_confirm_actions', True):
+                button = optionsdialog.show(
+                    T(32319, "Mark Played") if choice["key"] == "mark_watched" else T(32318, "Mark Unplayed"),
+                    u"{} {}".format(mli.label, mli.label2),
+                    T(32328, 'Yes'),
+                    T(32329, 'No'),
+                    dialog_props=self.carriedProps
+                )
 
-            if button != 0:
-                return
+                if button != 0:
+                    return
 
             if choice["key"] == "mark_watched":
                 mli.dataSource.markWatched()
@@ -1458,16 +1459,17 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                 self._updateOnDeckHubs()
 
         elif choice["key"] == "remove_cw":
-            button = optionsdialog.show(
-                T(33662, "Remove from Continue Watching"),
-                u"{} {}".format(mli.label, mli.label2),
-                T(32328, 'Yes'),
-                T(32329, 'No'),
-                dialog_props=self.carriedProps
-            )
+            if util.getSetting('home_confirm_actions', True):
+                button = optionsdialog.show(
+                    T(33662, "Remove from Continue Watching"),
+                    u"{} {}".format(mli.label, mli.label2),
+                    T(32328, 'Yes'),
+                    T(32329, 'No'),
+                    dialog_props=self.carriedProps
+                )
 
-            if button != 0:
-                return
+                if button != 0:
+                    return
 
             mli.dataSource.removeFromContinueWatching()
             self._updateOnDeckHubs()

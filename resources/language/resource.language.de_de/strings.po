@@ -2902,3 +2902,11 @@ msgstr "Wenn Dein Client HDR (oder HDR-Fallback) nicht abspielen soll, aktiviere
 msgctxt "#33662"
 msgid "Remove from Continue Watching"
 msgstr "Von Fortsetzen entfernen"
+
+msgctxt "#33663"
+msgid "Home: Confirm item actions"
+msgstr "Start: Aktionen bestätigen"
+
+msgctxt "#33664"
+msgid "When acting on items in the Home view, such as mark played, hide from continue watching etc., show a confirmation dialog."
+msgstr "Werden in der Start-Ansicht gewisse Aktionen auf Elementen ausgeführt, wie z. B. als gesehen markieren, von Fortsetzen entfernen, einen Bestätigungsdialog anzeigen."

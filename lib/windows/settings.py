@@ -595,6 +595,12 @@ class Settings(object):
                     T(32999, "")
                 ),
                 BoolSetting(
+                    'home_confirm_actions', T(33663, 'Home: Confirm item actions'), True
+                ).description(
+                    T(33664, "When acting on items in the Home view, such as mark played, hide from continue "
+                             "watching etc., show a confirmation dialog.")
+                ),
+                BoolSetting(
                     'hubs_round_robin', T(33043, ''), False
                 ).description(
                     T(33044, "").format(util.addonSettings.hubsRrMax)

@@ -2311,3 +2311,11 @@ msgstr ""
 msgctxt "#33662"
 msgid "Remove from Continue Watching"
 msgstr ""
+
+msgctxt "#33663"
+msgid "Home: Confirm item actions"
+msgstr ""
+
+msgctxt "#33664"
+msgid "When acting on items in the Home view, such as mark played, hide from continue watching etc., show a confirmation dialog."
+msgstr ""
