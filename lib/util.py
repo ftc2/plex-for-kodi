@@ -138,9 +138,11 @@ def _processSetting(setting, default, is_json=False):
         return float(setting)
     elif isinstance(default, int):
         return int(float(setting or 0))
-    elif isinstance(default, list) and not is_json:
-        if setting:
+    elif isinstance(default, list):
+        if setting and not is_json:
             return json.loads(binascii.unhexlify(setting))
+        elif setting and is_json:
+            return json.loads(setting)
         else:
             return default
 

@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import math
 import threading
 import time
+import traceback
 
 from kodi_six import xbmc
 from kodi_six import xbmcgui
@@ -12,6 +13,7 @@ from lib import kodijsonrpc
 from lib import player
 from lib import util
 from lib.util import T
+from plexnet.serverdecision import DecisionFailure
 from . import busy
 from . import dropdown
 from . import kodigui
@@ -386,12 +388,21 @@ class VideoPlayerWindow(kodigui.ControlledWindow, windowutils.UtilMixin, Spoiler
                 util.MONITOR.waitForAbort(0.1)
 
         self.setBackground()
-        if self.playQueue:
-            player.PLAYER.playVideoPlaylist(self.playQueue, resume=resume or self.resume, session_id=id(self),
-                                            handler=handler)
-        elif self.video:
-            player.PLAYER.playVideo(self.video, resume=resume or self.resume, force_update=True, session_id=id(self),
-                                    handler=handler)
+
+        try:
+            if self.playQueue:
+                player.PLAYER.playVideoPlaylist(self.playQueue, resume=resume or self.resume, session_id=id(self),
+                                                handler=handler)
+            elif self.video:
+                player.PLAYER.playVideo(self.video, resume=resume or self.resume, force_update=True, session_id=id(self),
+                                        handler=handler)
+        except DecisionFailure:
+            util.LOG("Can't play this media.")
+            self.doClose()
+
+        except Exception as e:
+            util.LOG("Playback failed: {}", traceback.format_exc())
+            self.doClose()
 
     def openItem(self, control=None, item=None):
         if not item:

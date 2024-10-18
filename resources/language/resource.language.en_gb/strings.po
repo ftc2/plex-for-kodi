@@ -2319,3 +2319,11 @@ msgstr ""
 msgctxt "#33664"
 msgid "When acting on items in the Home view, such as mark played, hide from continue watching etc., show a confirmation dialog."
 msgstr ""
+
+msgctxt "#33665"
+msgid "Disable audio codecs"
+msgstr ""
+
+msgctxt "#33666"
+msgid "Audio codecs you can't play back. Disables Direct Play for such media items, enables Direct Stream if possible, transcodes audio stream to compatible format."
+msgstr ""

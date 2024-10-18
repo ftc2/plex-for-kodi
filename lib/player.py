@@ -1241,7 +1241,7 @@ class PlexPlayer(xbmc.Player, signalsmixin.SignalsMixin):
             self.playerObject = self.playerObject.getServerDecision()
         except plexplayer.DecisionFailure as e:
             util.showNotification(e.reason, header=util.T(32448, 'Playback Failed!'))
-            return
+            raise
         except:
             util.ERROR(notify=True)
             return

@@ -501,6 +501,14 @@ class Settings(object):
                     T(32065, 'When force AC3 settings are enabled, treat DTS the same as AC3 '
                              '(useful for Optical passthrough)')
                 ),
+                MultiOptionsSetting(
+                    'audio_disabled_codecs', T(33665, 'Disable audio codecs'),
+                    [],
+                    list(sorted([(a, "{} ({})".format(b, a)) for a, b in plexnet.util.AUDIO_CODECS_VERB.items()]))
+                ).description(
+                    T(33666, "Audio codecs you can't play back. Disables Direct Play for such media items, "
+                             "enables Direct Stream if possible, transcodes audio stream to compatible format.")
+                ),
                 BoolSetting('audio_hires', T(33079, ''),
                             True).description(
                     T(33080, '')
