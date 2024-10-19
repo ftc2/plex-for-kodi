@@ -1486,11 +1486,11 @@ class SeekDialog(kodigui.BaseDialog):
         if changed and not self.showChapters:
             self.bigSeekChanged = True
             self.selectedOffset = self.bigSeekControl.getSelectedItem().dataSource + self.bigSeekOffset
-            self.updateProgress(set_to_current=False)
+            self.updateProgress(set_to_current=False, no_osd=True)
         elif self.showChapters:
             # when hovering chapters, show its corresponding time on the timeline, but don't act like we're seeking
             self.updateProgress(set_to_current=False, offset=self.bigSeekControl.getSelectedItem().dataSource,
-                                onlyTimeIndicator=True)
+                                onlyTimeIndicator=True, no_osd=True)
         self.resetSkipSteps()
 
     def bigSeekSelected(self):
@@ -1755,7 +1755,7 @@ class SeekDialog(kodigui.BaseDialog):
             self._forcedLastSkipAmount = 1 - lastSelectedOffset
             self.selectedOffset = 1
 
-        self.updateProgress(set_to_current=False)
+        self.updateProgress(set_to_current=False, no_osd=without_osd)
         self.setBigSeekShift()
         if auto_seek:
             self.resetAutoSeekTimer()
@@ -1791,7 +1791,7 @@ class SeekDialog(kodigui.BaseDialog):
         except RuntimeError:  # Not playing
             return 1
 
-    def updateProgress(self, set_to_current=True, offset=None, onlyTimeIndicator=False):
+    def updateProgress(self, set_to_current=True, offset=None, onlyTimeIndicator=False, no_osd=False):
         """
         Updates the progress bars (seek and position) and the currently-selected-time-label for the current position or
         seek state on the timeline.
@@ -1830,17 +1830,19 @@ class SeekDialog(kodigui.BaseDialog):
             self.setProperty('time.selection', util.simplifiedTimeDisplay(offset))
             self.selectionIndicatorImage.setWidth(101)
 
+        self.setProperty('bif.image', "")
         if onlyTimeIndicator:
             return
 
-        if self.hasBif:
-            bifUrl = self.handler.player.playerObject.getBifUrl(offset)
-            if "blur_chapters" in self.no_spoilers:
-                bifUrl = self.player.video.server.getImageTranscodeURL(bifUrl,
-                                                                       *PlaylistDialog.LI_AR16X9_THUMB_DIM,
-                                                                       **{"blur": util.addonSettings.episodeNoSpoilerBlur})
-            self.setProperty('bif.image', bifUrl)
-            self.bifImageControl.setPosition(bifx, 752)
+        if not no_osd or (no_osd and not self.no_time_no_osd_spoilers):
+            if self.hasBif:
+                bifUrl = self.handler.player.playerObject.getBifUrl(offset)
+                if "blur_chapters" in self.no_spoilers:
+                    bifUrl = self.player.video.server.getImageTranscodeURL(bifUrl,
+                                                                           *PlaylistDialog.LI_AR16X9_THUMB_DIM,
+                                                                           **{"blur": util.addonSettings.episodeNoSpoilerBlur})
+                self.setProperty('bif.image', bifUrl)
+                self.bifImageControl.setPosition(bifx, 752)
 
         self.seekbarControl.setPosition(0, self.seekbarControl.getPosition()[1])
         if set_to_current:
