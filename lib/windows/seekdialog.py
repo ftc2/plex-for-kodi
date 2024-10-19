@@ -50,6 +50,7 @@ MARKERS = OrderedDict([
         "countdown": None,
         "countdown_initial": None,
         "skipped": False,
+        "hidden": False,
 
         # attrs
         "markerAutoSkip": "autoSkipIntro",
@@ -65,6 +66,7 @@ MARKERS = OrderedDict([
         "countdown": None,
         "countdown_initial": None,
         "skipped": False,
+        "hidden": False,
 
         "markerAutoSkip": "autoSkipCredits",
         "markerAutoSkipped": False,
@@ -630,6 +632,9 @@ class SeekDialog(kodigui.BaseDialog):
                         if self.getProperty('show.markerSkip') and not self.getProperty('show.markerSkip_OSDOnly'):
                             self.setProperty('show.markerSkip', '')
                             self.setProperty('show.markerSkip_OSDOnly', '1')
+                            markerDef = self._currentMarker
+                            if markerDef:
+                                markerDef["hidden"] = True
                             return
 
                 if controlID == self.MAIN_BUTTON_ID:
@@ -2238,6 +2243,8 @@ class SeekDialog(kodigui.BaseDialog):
         # no marker auto skip and not yet skipped or not yet auto skipped, normal display
         if (markerAutoSkip and not markerAutoSkipped) or (not markerAutoSkip and not markerDef["skipped"]):
             self.setProperty('show.markerSkip', '1')
+            if not markerDef["hidden"]:
+                self.setProperty('show.markerSkip_OSDOnly', '')
         # marker auto skip and already skipped, or no autoskip and manually skipped - hide in OSD
         else:
             self.setProperty('show.markerSkip_OSDOnly', '1')
