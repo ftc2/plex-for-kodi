@@ -50,7 +50,7 @@ ADDON = xbmcaddon.Addon()
 
 SETTINGS_LOCK = threading.Lock()
 
-SKIN_PLEXTUARY = xbmc.getSkinDir() == "skin.plextuary"
+SKIN_PLEXTUARY = "skin.plextuary" in xbmc.getSkinDir()
 FROM_KODI_REPOSITORY = ADDON.getAddonInfo('name') == "PM4K for Plex"
 PROFILE = translatePath(ADDON.getAddonInfo('profile'))
 
