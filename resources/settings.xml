@@ -371,8 +371,13 @@
                 <setting id="postplay_timeout" type="integer" label="32501" help="32904">
                     <level>0</level>
                     <default>16</default>
-                    <control type="edit" format="integer">
-                        <heading>32501</heading>
+                    <constraints>
+                        <minimum>2</minimum>
+                        <step>1</step>
+                        <maximum>60</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
                     </control>
                 </setting>
                 <setting id="postplay_cancel" type="boolean" label="32905">
