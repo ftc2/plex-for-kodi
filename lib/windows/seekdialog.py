@@ -593,6 +593,11 @@ class SeekDialog(kodigui.BaseDialog):
                         self.player.playState == self.player.STATE_PLAYING:
                     self.hideOSD()
 
+                if action == xbmcgui.ACTION_CONTEXT_MENU:
+                    if self.getProperty('show.PPI'):
+                        self.showPPIDialog(real_ppi=True)
+                        return
+
                 passThroughMain = False
                 if controlID == self.SKIP_MARKER_BUTTON_ID:
                     if action == xbmcgui.ACTION_SELECT_ITEM:
@@ -739,7 +744,6 @@ class SeekDialog(kodigui.BaseDialog):
                         else:
                             self.showPPIDialog()
                         return
-
                 elif controlID == self.BIG_SEEK_LIST_ID:
                     if action in (xbmcgui.ACTION_MOVE_RIGHT, xbmcgui.ACTION_BIG_STEP_FORWARD):
                         return self.updateBigSeek(changed=True)
@@ -966,7 +970,13 @@ class SeekDialog(kodigui.BaseDialog):
         finally:
             kodigui.BaseDialog.doClose(self)
 
-    def showPPIDialog(self):
+    def showPPIDialog(self, real_ppi=False):
+        if self.getProperty('show.PPI'):
+            if real_ppi:
+                self.setProperty('show.PPI', '')
+                xbmc.executebuiltin('Action(PlayerProcessInfo)')
+            return
+
         for attrib in SESSION_ATTRIBUTE_TYPES.values():
             self.setProperty('ppi.%s' % attrib.label, "")
 
