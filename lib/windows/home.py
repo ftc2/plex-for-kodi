@@ -1393,6 +1393,8 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             hub_title = plexapp.SERVERMANAGER.selectedServer.currentHubs.get(section_hub_key,
                                                                              section_hub_key)
 
+        select_base = 0
+
         options = []
         has_prev = False
         if hub.hubIdentifier not in ("home.continue", "continueWatching"):
@@ -1403,18 +1405,31 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             if has_prev:
                 options.append(dropdown.SEPARATOR)
 
+            has_mp = False
             if not mli.getProperty('watched'):
                 options.append({'key': 'mark_watched', 'display': T(32319, "Mark Played")})
-            else:
+                select_base = has_prev and 1 or 0
+                has_mp = True
+
+            if mli.dataSource.isFullyWatched or mli.dataSource.isWatched or mli.dataSource.TYPE == "season":
                 options.append({'key': 'mark_unwatched', 'display': T(32318, "Mark Unplayed")})
+                select_base = has_prev and 1 or has_mp and 0
+                has_mp = True
 
-            if (mli.dataSource.TYPE in ('episode', 'movie') and
+            if mli.dataSource.TYPE in ('episode', 'movie'):
                     #hub.hubIdentifier == "continueWatching"):
-                    hub.hubIdentifier in ("home.continue", "continueWatching", "home.ondeck")):
-                # allow removing items from CW
-                options.append(dropdown.SEPARATOR)
-                options.append({'key': 'remove_cw', 'display': T(33662, "Remove from Continue Watching")})
+                if hub.hubIdentifier in ("home.continue", "continueWatching", "home.ondeck"):
+                    # allow removing items from CW
+                    options.append(dropdown.SEPARATOR)
+                    options.append({'key': 'remove_cw', 'display': T(33662, "Remove from Continue Watching")})
+                    if not has_mp:
+                        select_base = 1
 
+            if mli.dataSource.TYPE in ('episode', 'season'):
+                options.append(dropdown.SEPARATOR)
+                options.append({'key': 'to_show', 'display': T(32323, "Go To Show")})
+                if mli.dataSource.TYPE == 'episode':
+                    options.append({'key': 'to_season', 'display': T(32400, "Go To Season")})
 
         choice = dropdown.showDropdown(
             options,
@@ -1422,7 +1437,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             close_direction='none',
             set_dropdown_prop=False,
             header=T(33030, 'Choose action for: {}').format(hub.title),
-            select_index=1 if len(options) > 1 else 0,
+            select_index=select_base,
             align_items="left",
             dialog_props=self.carriedProps
         )
@@ -1473,6 +1488,16 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
 
             mli.dataSource.removeFromContinueWatching()
             self._updateOnDeckHubs()
+
+        elif choice["key"] in ("to_season", "to_show"):
+            target = mli.dataSource.show() if choice["key"] == "to_show" else mli.dataSource.season()
+            try:
+                command = opener.open(target, dialog_props=self.carriedProps)
+                if command == "NODATA":
+                    raise util.NoDataException
+            except util.NoDataException:
+                util.ERROR("No data - disconnected?", notify=True, time_ms=5000)
+                return
 
     def sectionMover(self, item, action):
         def stop_moving(reset=False):
