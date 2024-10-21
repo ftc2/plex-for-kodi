@@ -2150,6 +2150,7 @@ class SeekDialog(kodigui.BaseDialog):
             # this might be counter intuitive, but self._currentMarker is a reference to a dict
             if self._currentMarker:
                 self._currentMarker["countdown"] = None
+                setattr(self, self._currentMarker["markerAutoSkipShownTimer"], None)
             self._currentMarker = None
             return False
 
@@ -2179,6 +2180,7 @@ class SeekDialog(kodigui.BaseDialog):
         if cancelTimer and self.countingDownMarker:
             self.countingDownMarker = False
             markerDef["markerAutoSkipped"] = True
+            markerDef["hidden"] = True
             setattr(self, markerDef["markerAutoSkipShownTimer"], None)
             self.setProperty('show.markerSkip', '')
             return False
@@ -2237,6 +2239,7 @@ class SeekDialog(kodigui.BaseDialog):
 
         # got a marker, display logic
         # hide marker into OSD after a timeout
+        # fixme: "markerAutoSkipShownTimer" should be "markerSkipShownTimer"
         timer = getattr(self, markerDef["markerAutoSkipShownTimer"])
 
         if timer is None or self.player.playState == self.player.STATE_PAUSED:
@@ -2247,6 +2250,7 @@ class SeekDialog(kodigui.BaseDialog):
             if not self.getProperty('show.markerSkip_OSDOnly'):
                 if timer + getattr(self, markerDef["markerSkipBtnTimeout"]) <= time.time():
                     self.setProperty('show.markerSkip_OSDOnly', '1')
+                    markerDef["hidden"] = True
                 else:
                     self.setProperty('show.markerSkip_OSDOnly', '')
 
