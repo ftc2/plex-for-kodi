@@ -9,6 +9,7 @@ import random
 
 from kodi_six import xbmc
 from kodi_six import xbmcgui
+from iso639 import languages
 from . import backgroundthread
 from . import kodijsonrpc
 from . import colors
@@ -227,6 +228,7 @@ class SeekPlayerHandler(BasePlayerHandler):
         self.waitingForSOS = False
         self._lastDuration = 0
         self._progressHld = {}
+        self._subtitleStreamOffset = None
         self.mode = self.MODE_RELATIVE
         self.ended = False
         self.stoppedManually = False
@@ -250,6 +252,7 @@ class SeekPlayerHandler(BasePlayerHandler):
         self.inBingeMode = False
         self.skipPostPlay = False
         self.prePlayWitnessed = False
+        self._subtitleStreamOffset = None
         self.getDialog(setup=True)
         self.dialog.setup(self.duration, meta, int(self.baseOffset * 1000), self.bifURL, self.title, self.title2,
                           chapters=self.chapters, keepMarkerDef=seeking == self.SEEK_IN_PROGRESS)
@@ -463,9 +466,9 @@ class SeekPlayerHandler(BasePlayerHandler):
                 playerID = kodijsonrpc.rpc.Player.GetActivePlayers()[0]["playerid"]
                 currIdx = kodijsonrpc.rpc.Player.GetProperties(playerid=playerID, properties=['currentsubtitle'])[
                     'currentsubtitle']['index']
-                if currIdx != self.player.video._current_subtitle_idx:
+                if currIdx != self.player.video._current_subtitle_idx + self.subtitleStreamOffset:
                     util.LOG("Embedded Subtitle index was incorrect ({}), setting to: {}".
-                             format(currIdx, self.player.video._current_subtitle_idx))
+                             format(currIdx, self.player.video._current_subtitle_idx + self.subtitleStreamOffset))
                     self.dialog.setSubtitles()
                 else:
                     util.DEBUG_LOG("Embedded subtitle was correctly set in Kodi")
@@ -643,6 +646,63 @@ class SeekPlayerHandler(BasePlayerHandler):
         self.updateOffset()
         # self.showOSD(from_seek=True)
 
+    @property
+    def subtitleStreamOffset(self):
+        if self.player.playerObject and self.isDirectPlay and self.player.playerObject.metadata.isMapped:
+            if self._subtitleStreamOffset is not None:
+                return self._subtitleStreamOffset
+
+            # when mapped, Kodi finds external subs on its own and places them at the top of the list, before
+            # embedded subs.
+            try:
+                playerID = kodijsonrpc.rpc.Player.GetActivePlayers()[0]["playerid"]
+                kodisubs = kodijsonrpc.rpc.Player.GetProperties(playerid=playerID, properties=['subtitles'])["subtitles"]
+            except IndexError:
+                # this can happen occasionally, if the player isn't ready, yet, but we account for that
+                return 0
+            else:
+                # find embedded subtitle stream in Plex
+                ess = None
+                ext_subs_amount = 0
+                for ss in self.player.video.subtitleStreams:
+                    if not ess and ss.embedded:
+                        ess = ss
+                    elif not ss.embedded:
+                        ext_subs_amount += 1
+
+                if not ess:
+                    self._subtitleStreamOffset = 0
+                    return 0
+
+                # find embedded subtitle stream in Kodi stream list
+                # we know Kodi puts external subtitles first, start there (Kodi might see more external subs or the PMS
+                # hasn't detected them, so we still need to find the embedded sub we're searching for)
+
+                # use iso639 to determine the streams' languages (Kodi uses the bibliographic language code, Plex uses
+                # the terminological one (e.g: ger vs. deu, fre vs. fra)
+                ess_lang = languages.get(part2t=ess.languageCode)
+                for sub in kodisubs[ext_subs_amount:]:
+                    if (sub['isdefault'] == ess.default.asBool() and sub['isforced'] == ess.forced.asBool() and
+                            sub['name'] == six.ensure_str(ess.title) and languages.get(
+                                part2b=sub['language']) == ess_lang):
+                        self._subtitleStreamOffset = sub['index'] - ess.typeIndex
+                        return self._subtitleStreamOffset
+
+                util.LOG("Couldn't find embedded subtitle in Kodi subtitle list: {}, assuming no difference", ess)
+                self._subtitleStreamOffset = 0
+
+                # old implementation
+                # embeddedStreams = list(filter(lambda x: x.embedded, self.player.video.subtitleStreams))
+                # difflen = len(kodisubs) - len(embeddedStreams)
+                ## does our sub-count differ from the one Kodi sees? if so, adjust the offset
+                # if difflen > 0:
+                #    self._subtitleStreamOffset = difflen
+                #    return self._subtitleStreamOffset
+                ## if not, do we have external subtitles? if so, we need to adjust the offset
+                # self._subtitleStreamOffset = len(list(filter(lambda x: not x.embedded, self.player.video.subtitleStreams)))
+                # return self._subtitleStreamOffset
+        return 0
+
     def setSubtitles(self, do_sleep=True, honor_forced_subtitles_override=True):
         if not self.player.video:
             util.LOG("Warning: SetSubtitles: no player.video object available")
@@ -651,6 +711,11 @@ class SeekPlayerHandler(BasePlayerHandler):
         subs = self.player.video.selectedSubtitleStream(
             forced_subtitles_override=honor_forced_subtitles_override and util.getSetting("forced_subtitles_override",
                                                                                           False))
+
+        # we want to get the subtitle stream offset regardless of whether we have subtitles selected or not,
+        # as the subtitle amount might change during playback (e.g. kodi subtitle download adds one to the list)
+        # but our concern are existing external subtitles in path mapped mode, which Kodi adds to the top of the list
+        sso = self.subtitleStreamOffset
         if subs:
             if do_sleep:
                 xbmc.sleep(100)
@@ -666,8 +731,9 @@ class SeekPlayerHandler(BasePlayerHandler):
                 else:
                     # u_til.TEST(subs.__dict__)
                     # u_til.TEST(self.player.video.mediaChoice.__dict__)
-                    util.DEBUG_LOG('Enabling embedded subtitles at: {0} ({1})', subs.typeIndex, subs)
-                    self.player.setSubtitleStream(subs.typeIndex)
+
+                    util.DEBUG_LOG('Enabling embedded subtitles at: {0} ({1})', subs.typeIndex + sso, subs)
+                    self.player.setSubtitleStream(subs.typeIndex + sso)
                     self.player.showSubtitles(True)
 
         else:
