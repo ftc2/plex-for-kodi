@@ -1425,8 +1425,8 @@ class SeekDialog(kodigui.BaseDialog):
                 util.DEBUG_LOG("Waiting for seekOnStart to apply: {}", self.handler.seekOnStart)
 
             waited = 0
-            while self.handler.seekOnStart and waited < 20:
-                xbmc.sleep(100)
+            while self.handler.seekOnStart and waited < 20 and not util.MONITOR.abortRequested():
+                util.MONITOR.waitForAbort(0.1)
                 waited += 1
 
             if waited < 20:

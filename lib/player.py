@@ -611,17 +611,17 @@ class SeekPlayerHandler(BasePlayerHandler):
             withinSOS = self.seekOnStart - 5000
 
             tries = 0
-            while not self.player.isPlayingVideo() and tries < 50:
-                xbmc.sleep(100)
+            while not self.player.isPlayingVideo() and tries < 50 and not util.MONITOR.abortRequested():
+                util.MONITOR.waitForAbort(0.1)
                 tries += 1
 
             if self.player.getTime() * 1000 < withinSOS:
                 self.waitingForSOS = True
                 # checking infoLabel Player.Seeking would be the better solution here, but we're dealing with stuff like
                 # CoreELEC, which doesn't necessarily properly honor this
-                xbmc.sleep(250)
+                util.MONITOR.waitForAbort(0.25)
                 self.seek(self.seekOnStart)
-                xbmc.sleep(util.addonSettings.coreelecResumeSeekWait)
+                util.MONITOR.waitForAbort(util.addonSettings.coreelecResumeSeekWait / 1000.0)
 
                 util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: "
                                "Expecting to be within 5 seconds of {}, currently at: {}", self.seekOnStart,
@@ -629,12 +629,14 @@ class SeekPlayerHandler(BasePlayerHandler):
 
                 tries = 0
                 max_tries = int(5000 / util.addonSettings.coreelecResumeSeekWait)
-                while self.player.isPlayingVideo() and self.player.getTime() * 1000 < withinSOS and tries < max_tries:
+                while self.player.isPlayingVideo() and self.player.getTime() * 1000 < withinSOS and tries < max_tries\
+                        and not util.MONITOR.abortRequested():
                     util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: Not there, yet, "
                                    "seeking again ({}, {})", self.seekOnStart, self.player.getTime())
+                    util.MONITOR.waitForAbort(0.25)
                     self.seek(self.seekOnStart)
                     tries += 1
-                    xbmc.sleep(util.addonSettings.coreelecResumeSeekWait)
+                    util.MONITOR.waitForAbort(util.addonSettings.coreelecResumeSeekWait / 1000.0)
                 if tries >= max_tries:
                     util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: Couldn't properly seek on start within ~5 seconds.")
                 else:
