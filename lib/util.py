@@ -222,7 +222,6 @@ class AddonSettings(object):
         ("tickrate", 1.0),
         ("honor_plextv_dnsrebind", True),
         ("honor_plextv_pam", True),
-        ("coreelec_resume_fix", True),
         ("coreelec_resume_seek_wait", 500),
         ("background_resolution_scale_perc", 100),
     )

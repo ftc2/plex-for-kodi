@@ -216,7 +216,7 @@ class SeekPlayerHandler(BasePlayerHandler):
         self.skipPostPlay = False
         self.prePlayWitnessed = False
         self.queuingNext = False
-        self.useAlternateSeek = util.isCoreELEC and util.addonSettings.coreelecResumeFix
+        self.useAlternateSeek = util.isCoreELEC and util.getSetting('use_alternate_seek', False)
         self.useResumeFix = self.useAlternateSeek
         self.reset()
 

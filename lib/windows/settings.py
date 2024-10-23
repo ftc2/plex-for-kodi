@@ -632,6 +632,10 @@ class Settings(object):
                     T(33046, '')),
                 BoolSetting('no_osd_time_spoilers', T(33004, ''), False, backport_from="no_spoilers").description(
                     T(33005, '')),
+                BoolSetting('use_alternate_seek', T(33667, 'CoreELEC: Use alternate seek'), False).description(
+                    T(33668, 'Enables an alternate method to seek on CoreELEC due to a seemingly '
+                             'buggy implementation. Use this if you have audio issues after seeking/resuming.'
+                      )) if util.isCoreELEC else None,
                 MultiUAOptionsSetting(
                     'player_show_buttons', T(33057, 'Show buttons'),
                     ['subtitle_downloads', 'skip_intro', 'skip_credits'],
