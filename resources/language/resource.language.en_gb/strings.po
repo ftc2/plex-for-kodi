@@ -2327,3 +2327,11 @@ msgstr ""
 msgctxt "#33666"
 msgid "Audio codecs you can't play back. Disables Direct Play for such media items, enables Direct Stream if possible, transcodes audio stream to compatible format."
 msgstr ""
+
+msgctxt "#33667"
+msgid "CoreELEC: Resume-fix"
+msgstr ""
+
+msgctxt "#33668"
+msgid "Enables an alternate method to seek on CoreELEC due to a seemingly buggy implementation. Brings its own issues and depends on the setting below."
+msgstr ""

@@ -216,7 +216,8 @@ class SeekPlayerHandler(BasePlayerHandler):
         self.skipPostPlay = False
         self.prePlayWitnessed = False
         self.queuingNext = False
-        self.useAlternateSeek = util.isCoreELEC
+        self.useAlternateSeek = util.isCoreELEC and util.addonSettings.coreelecResumeFix
+        self.useResumeFix = self.useAlternateSeek
         self.reset()
 
     def reset(self):
@@ -616,32 +617,35 @@ class SeekPlayerHandler(BasePlayerHandler):
                 tries += 1
 
             if self.player.getTime() * 1000 < withinSOS:
-                self.waitingForSOS = True
-                # checking infoLabel Player.Seeking would be the better solution here, but we're dealing with stuff like
-                # CoreELEC, which doesn't necessarily properly honor this
-                util.MONITOR.waitForAbort(0.25)
-                self.seek(self.seekOnStart)
-                util.MONITOR.waitForAbort(util.addonSettings.coreelecResumeSeekWait / 1000.0)
-
-                util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: "
-                               "Expecting to be within 5 seconds of {}, currently at: {}", self.seekOnStart,
-                               self.player.getTime())
-
-                tries = 0
-                max_tries = int(5000 / util.addonSettings.coreelecResumeSeekWait)
-                while self.player.isPlayingVideo() and self.player.getTime() * 1000 < withinSOS and tries < max_tries\
-                        and not util.MONITOR.abortRequested():
-                    util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: Not there, yet, "
-                                   "seeking again ({}, {})", self.seekOnStart, self.player.getTime())
+                if self.useResumeFix:
+                    self.waitingForSOS = True
+                    # checking infoLabel Player.Seeking would be the better solution here, but we're dealing with stuff like
+                    # CoreELEC, which doesn't necessarily properly honor this
                     util.MONITOR.waitForAbort(0.25)
-                    self.seek(self.seekOnStart)
-                    tries += 1
+                self.seek(self.seekOnStart)
+
+                if self.useResumeFix:
                     util.MONITOR.waitForAbort(util.addonSettings.coreelecResumeSeekWait / 1000.0)
-                if tries >= max_tries:
-                    util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: Couldn't properly seek on start within ~5 seconds.")
-                else:
-                    util.DEBUG_LOG("OnPlayBackSeek: Seeked on start to: {0}", self.seekOnStart)
-                self.waitingForSOS = False
+
+                    util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: "
+                                   "Expecting to be within 5 seconds of {}, currently at: {}", self.seekOnStart,
+                                   self.player.getTime())
+
+                    tries = 0
+                    max_tries = int(5000 / util.addonSettings.coreelecResumeSeekWait)
+                    while self.player.isPlayingVideo() and self.player.getTime() * 1000 < withinSOS and tries < max_tries\
+                            and not util.MONITOR.abortRequested():
+                        util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: Not there, yet, "
+                                       "seeking again ({}, {})", self.seekOnStart, self.player.getTime())
+                        util.MONITOR.waitForAbort(0.25)
+                        self.seek(self.seekOnStart)
+                        tries += 1
+                        util.MONITOR.waitForAbort(util.addonSettings.coreelecResumeSeekWait / 1000.0)
+                    if tries >= max_tries:
+                        util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: Couldn't properly seek on start within ~5 seconds.")
+                    else:
+                        util.DEBUG_LOG("OnPlayBackSeek: Seeked on start to: {0}", self.seekOnStart)
+                    self.waitingForSOS = False
             self.dialog.offset = self.seekOnStart
             self.seekOnStart = 0
 
