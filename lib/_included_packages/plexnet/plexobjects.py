@@ -51,6 +51,12 @@ class PlexValue(six.text_type):
     def __deepcopy__(self, memodict=None):
         return self.__class__(self)
 
+    def __gt__(self, other):
+        return self.asInt() > other
+
+    def __lt__(self, other):
+        return self.asInt() < other
+
     def asBool(self):
         return self == '1'
 

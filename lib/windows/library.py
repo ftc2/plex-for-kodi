@@ -23,6 +23,7 @@ from . import busy
 from . import dropdown
 from . import kodigui
 from . import opener
+from . import optionsdialog
 from . import preplay
 from . import search
 from . import subitems
@@ -470,15 +471,20 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
             elif action == xbmcgui.ACTION_MOUSE_DRAG:
                 self.onMouseDrag(action)
             elif action == xbmcgui.ACTION_CONTEXT_MENU:
-                if not xbmc.getCondVisibility('ControlGroup({0}).HasFocus(0)'.format(self.OPTIONS_GROUP_ID)):
-                    self.lastNonOptionsFocusID = self.lastFocusID
-                    self.setFocusId(self.OPTIONS_GROUP_ID)
-                    return
-                else:
-                    if self.lastNonOptionsFocusID:
-                        self.setFocusId(self.lastNonOptionsFocusID)
-                        self.lastNonOptionsFocusID = None
+                # item action possible?
+                had_action = self.itemOptions()
+                if not had_action:
+                    if not xbmc.getCondVisibility('ControlGroup({0}).HasFocus(0)'.format(self.OPTIONS_GROUP_ID)):
+                        self.lastNonOptionsFocusID = self.lastFocusID
+                        self.setFocusId(self.OPTIONS_GROUP_ID)
                         return
+                    else:
+                        if self.lastNonOptionsFocusID:
+                            self.setFocusId(self.lastNonOptionsFocusID)
+                            self.lastNonOptionsFocusID = None
+                            return
+                else:
+                    return
 
             elif action in (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_CONTEXT_MENU):
                 if not xbmc.getCondVisibility('ControlGroup({0}).HasFocus(0)'.format(self.OPTIONS_GROUP_ID)) and \
@@ -537,6 +543,65 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
             return
 
         self.showPhotoItemProperties(mli.dataSource)
+
+    def itemOptions(self):
+        mli = self.showPanelControl.getSelectedItem()
+        if not mli:
+            return True
+
+        if mli.dataSource is None:
+            return True
+
+        if mli.dataSource.TYPE in ('episode', 'season', 'movie', 'show'):
+            options = []
+            ds = mli.dataSource
+            if not mli.getProperty('watched'):
+                options.append({'key': 'mark_watched', 'display': T(32319, "Mark Played")})
+
+            if (ds.isFullyWatched or ds.isWatched or
+                    (ds.TYPE in ("show", "season") and 0 < ds.unViewedLeafCount < ds.leafCount)):
+                options.append({'key': 'mark_unwatched', 'display': T(32318, "Mark Unplayed")})
+
+            title = mli.label
+            secondary = mli.label2
+            if ds.TYPE in ("movie", "show"):
+                secondary = mli.getProperty('year')
+            elif ds.TYPE == "episode":
+                title = ds.defaultTitle
+                secondary = mli.getProperty('subtitle')
+
+            label = u"{} ({})".format(six.ensure_str(title), six.ensure_str(secondary))
+
+            choice = dropdown.showDropdown(
+                options,
+                pos=(660, 441),
+                close_direction='none',
+                set_dropdown_prop=False,
+                header=T(33030, 'Choose action for: {}').format(label),
+                align_items="left",
+            )
+
+            if choice and choice["key"] in ("mark_watched", "mark_unwatched"):
+                if util.getSetting('home_confirm_actions', True):
+                    button = optionsdialog.show(
+                        T(32319, "Mark Played") if choice["key"] == "mark_watched" else T(32318, "Mark Unplayed"),
+                        label,
+                        T(32328, 'Yes'),
+                        T(32329, 'No'),
+                    )
+
+                    if button != 0:
+                        return True
+
+                if choice["key"] == "mark_watched":
+                    mli.dataSource.markWatched()
+                    self.updateUnwatchedAndProgress(mli)
+
+                elif choice["key"] == "mark_unwatched":
+                    mli.dataSource.markUnwatched()
+                    self.updateUnwatchedAndProgress(mli)
+            return True
+
 
     def updateKey(self, mli=None):
         mli = mli or self.showPanelControl.getSelectedItem()
@@ -1044,7 +1109,6 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
         mli.dataSource.reload()
         if mli.dataSource.isWatched:
             mli.setProperty('unwatched', '')
-            mli.setBoolProperty('watched', mli.dataSource.isFullyWatched)
             mli.setProperty('unwatched.count', '')
         else:
             if self.section.TYPE == 'show' or mli.dataSource.TYPE == 'show' or mli.dataSource.TYPE == 'season':
@@ -1052,6 +1116,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                 mli.setBoolProperty('unwatched.count.large', mli.dataSource.unViewedLeafCount > 999)
             else:
                 mli.setProperty('unwatched', '1')
+        mli.setBoolProperty('watched', mli.dataSource.isFullyWatched)
         mli.setProperty('progress', util.getProgressImage(mli.dataSource))
 
     def setTitle(self):
@@ -1405,13 +1470,14 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                             subtitle = "\n" + subtitle
                         else:
                             subtitle = ' - ' + obj.originallyAvailableAt.asDatetime('%m/%d/%y')
-                        mli.setLabel((obj.defaultTitle or '') + subtitle)
+                        mli.setLabel((obj.defaultTitle or ''))# + subtitle)
 
                         mli.setThumbnailImage(obj.defaultThumb.asTranscodedImageURL(*thumbDim))
 
                         mli.setProperty('summary', obj.summary)
 
-                        mli.setLabel2(util.durationToText(obj.fixedDuration()))
+                        #mli.setLabel2(util.durationToText(obj.fixedDuration()))
+                        mli.setLabel2(subtitle)
                         mli.setProperty('art', obj.defaultArt.asTranscodedImageURL(*artDim))
                         if not obj.isWatched:
                             mli.setProperty('unwatched', '1')

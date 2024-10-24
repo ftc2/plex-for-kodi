@@ -108,7 +108,7 @@
                             <label>$INFO[ListItem.Label]</label>
                         </control>
                         <control type="label">
-                            <visible>!String.IsEmpty(ListItem.Property(year))</visible>
+                            <visible>!String.IsEmpty(ListItem.Property(subtitle))</visible>
                             <scroll>false</scroll>
                             <posx>0</posx>
                             <posy>{{ vscale(396) }}</posy>
@@ -116,7 +116,19 @@
                             <height>{{ vscale(72) }}</height>
                             <font>font10</font>
                             <align>center</align>
-                            <textcolor>FFFFFFFF</textcolor>
+                            <textcolor>A0FFFFFF</textcolor>
+                            <label>$INFO[ListItem.Property(subtitle)]</label>
+                        </control>
+                        <control type="label">
+                            <visible>!String.IsEmpty(ListItem.Property(year)) + String.IsEmpty(ListItem.Property(subtitle))</visible>
+                            <scroll>false</scroll>
+                            <posx>0</posx>
+                            <posy>{{ vscale(396) }}</posy>
+                            <width>244</width>
+                            <height>{{ vscale(72) }}</height>
+                            <font>font10</font>
+                            <align>center</align>
+                            <textcolor>A0FFFFFF</textcolor>
                             <label>$INFO[ListItem.Property(year)]</label>
                         </control>
                     </control>
@@ -193,7 +205,7 @@
                                 <label>$INFO[ListItem.Label]</label>
                             </control>
                             <control type="label">
-                                <visible>!String.IsEmpty(ListItem.Property(year))</visible>
+                                <visible>!String.IsEmpty(ListItem.Property(subtitle))</visible>
                                 <scroll>false</scroll>
                                 <posx>0</posx>
                                 <posy>{{ vscale(396) }}</posy>
@@ -201,7 +213,19 @@
                                 <height>{{ vscale(72) }}</height>
                                 <font>font10</font>
                                 <align>center</align>
-                                <textcolor>FFFFFFFF</textcolor>
+                                <textcolor>A0FFFFFF</textcolor>
+                                <label>$INFO[ListItem.Property(subtitle)]</label>
+                            </control>
+                            <control type="label">
+                                <visible>!String.IsEmpty(ListItem.Property(year)) + String.IsEmpty(ListItem.Property(subtitle))</visible>
+                                <scroll>false</scroll>
+                                <posx>0</posx>
+                                <posy>{{ vscale(396) }}</posy>
+                                <width>244</width>
+                                <height>{{ vscale(72) }}</height>
+                                <font>font10</font>
+                                <align>center</align>
+                                <textcolor>A0FFFFFF</textcolor>
                                 <label>$INFO[ListItem.Property(year)]</label>
                             </control>
                         </control>

@@ -119,7 +119,7 @@
                             <font>font10</font>
                             <align>center</align>
                             <textcolor>FFFFFFFF</textcolor>
-                            <label>$INFO[ListItem.Label] ($INFO[ListItem.Property(year)])</label>
+                            <label>$INFO[ListItem.Label] [COLOR A0FFFFFF]($INFO[ListItem.Property(year)])[/COLOR]</label>
                         </control>
                         <control type="label">
                             <visible>String.IsEmpty(ListItem.Property(subtitle)) + String.IsEmpty(ListItem.Property(year))</visible>
@@ -210,6 +210,7 @@
                             <control type="label">
                                 <visible>String.IsEmpty(ListItem.Property(subtitle)) + !String.IsEmpty(ListItem.Property(year))</visible>
                                 <scroll>true</scroll>
+                                <scrollspeed>15</scrollspeed>
                                 <posx>0</posx>
                                 <posy>{{ vscale(218) }}</posy>
                                 <width>144</width>
@@ -217,11 +218,12 @@
                                 <font>font10</font>
                                 <align>center</align>
                                 <textcolor>FFFFFFFF</textcolor>
-                                <label>$INFO[ListItem.Label] ($INFO[ListItem.Property(year)])</label>
+                                <label>$INFO[ListItem.Label] [COLOR A0FFFFFF]($INFO[ListItem.Property(year)])[/COLOR]</label>
                             </control>
                             <control type="label">
                                 <visible>String.IsEmpty(ListItem.Property(subtitle)) + String.IsEmpty(ListItem.Property(year))</visible>
                                 <scroll>true</scroll>
+                                <scrollspeed>15</scrollspeed>
                                 <posx>0</posx>
                                 <posy>{{ vscale(218) }}</posy>
                                 <width>144</width>
@@ -234,6 +236,7 @@
                             <control type="label">
                                 <visible>!String.IsEmpty(ListItem.Property(subtitle))</visible>
                                 <scroll>true</scroll>
+                                <scrollspeed>15</scrollspeed>
                                 <posx>0</posx>
                                 <posy>{{ vscale(218) }}</posy>
                                 <width>144</width>
