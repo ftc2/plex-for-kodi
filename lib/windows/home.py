@@ -2440,6 +2440,19 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         elif option == 'refresh_users':
             plexapp.ACCOUNT.updateHomeUsers(refreshSubscription=True)
             return True
+        elif option == 'signout':
+            button = optionsdialog.show(
+                T(32344, 'Sign Out'),
+                T(33669, 'Really sign out?'),
+                T(32329, 'No'),
+                T(32328, 'Yes'),
+                dialog_props=self.carriedProps
+            )
+
+            if button != 1:
+                return
+            self.closeOption = option
+            self.doClose()
         else:
             self.closeOption = option
             self.doClose()

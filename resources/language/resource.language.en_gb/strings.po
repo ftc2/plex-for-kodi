@@ -2335,3 +2335,7 @@ msgstr ""
 msgctxt "#33668"
 msgid "Enables an alternate method to seek on CoreELEC due to a seemingly buggy implementation. Use this if you have audio issues after seeking/resuming."
 msgstr ""
+
+msgctxt "#33669"
+msgid "Really sign out?"
+msgstr ""

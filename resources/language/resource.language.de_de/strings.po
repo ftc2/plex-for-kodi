@@ -2926,3 +2926,7 @@ msgstr "CoreELEC: Alternatives Spulen"
 msgctxt "#33668"
 msgid "Enables an alternate method to seek on CoreELEC due to a seemingly buggy implementation. Use this if you have audio issues after seeking/resuming."
 msgstr "Aktiviert eine alternative Methode zum Spulen auf CoreELEC-Clients, wegen einer fehleranfälligen Implementation. Das kann benutzt werden, sollten beim Spulen/Fortsetzen Audio-Probleme auftreten."
+
+msgctxt "#33669"
+msgid "Really sign out?"
+msgstr "Wirklich abmelden?"
