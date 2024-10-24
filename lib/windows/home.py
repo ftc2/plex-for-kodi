@@ -1411,7 +1411,8 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                 select_base = has_prev and 1 or 0
                 has_mp = True
 
-            if mli.dataSource.isFullyWatched or mli.dataSource.isWatched or mli.dataSource.TYPE == "season":
+            if (mli.dataSource.isFullyWatched or mli.dataSource.isWatched or
+                    mli.dataSource.viewedLeafCount.asInt() > 0):
                 options.append({'key': 'mark_unwatched', 'display': T(32318, "Mark Unplayed")})
                 select_base = has_prev and 1 or has_mp and 0
                 has_mp = True
