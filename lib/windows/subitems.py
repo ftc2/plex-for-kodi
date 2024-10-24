@@ -97,8 +97,8 @@ class ShowWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMixin, 
 
         self.setFocusId(self.PLAY_BUTTON_ID)
 
-    def onInit(self):
-        super(ShowWindow, self).onInit()
+    def onInit(self, *args, **kwargs):
+        super(ShowWindow, self).onInit(*args, **kwargs)
         if self.mediaItem.theme and (not self.cameFrom or self.cameFrom != self.mediaItem.ratingKey) \
                 and not util.getSetting("slow_connection", False):
             self.cameFrom = self.mediaItem.ratingKey
