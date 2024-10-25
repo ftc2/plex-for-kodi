@@ -797,11 +797,11 @@ class Settings(object):
                 .description(T(33673, "Automatically check for updates periodically. If installed from a "
                                       "Kodi repository and the Update Source setting is set to Repository, Kodi "
                                       "itself will handle the updating of this addon. "
-                                      "Needs a Kodi restart when changed.")),
+                                      "Needs a Kodi restart when changed.")) if not util.FROM_KODI_REPOSITORY else None,
                 BoolSetting('update_check_startup', T(33674, 'Check for updates on start'), True)
                 .description(T(33675, "Automatically check for updates on startup. "
                                       "Doesn't do much when Update source is Repository."
-                                      "Needs a Kodi restart when changed.")),
+                                      "Needs a Kodi restart when changed.")) if not util.FROM_KODI_REPOSITORY else None,
                 OptionsSetting(
                     'update_source',
                     T(33676, 'Update source'),
@@ -811,7 +811,8 @@ class Settings(object):
                 ).description(T(33677, 'Specifies the update mode. Will immediately check for a new version '
                                        'when changed and closing settings.\nDefault: Repository\n\nBeta: Bleeding '
                                        'edge (possibly unstable)\nStable: Stable branch (faster than Repository)\n'
-                                       'Repository: Kodi repository (official (slow) or Don\'t Panic)')),
+                                       'Repository: Kodi repository (official (slow) or Don\'t Panic)')
+                              ) if not util.FROM_KODI_REPOSITORY else None,
                 BoolSetting('exit_default_is_quit', T(32965, 'Start Plex On Kodi Startup'), False)
                 .description(T(32966, "stub")),
                 BoolSetting('path_mapping', T(33000, ''), True).description(T(33001, '')),
