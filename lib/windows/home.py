@@ -738,6 +738,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
 
     def service_responder(self):
         if util.getGlobalProperty('update_available'):
+            is_downgrade = bool(util.getGlobalProperty('update_is_downgrade', consume=True))
             button = optionsdialog.show(
                 T(33670, 'Update available'),
                 T(33671, 'Current: {current_version}\nNew: {new_version}').format(
@@ -745,7 +746,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                     new_version=util.getGlobalProperty('update_available'),
                 ),
                 T(33683, 'Exit, download and install'),
-                T(33684, 'Later')
+                T(33684, 'Later') if not is_downgrade else T(32329, 'No')
             )
             if button == 0:
                 resp = "commence"

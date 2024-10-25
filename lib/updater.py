@@ -89,6 +89,7 @@ class Updater(object):
     mode = "beta"
     branch = None
     remote_version = None
+    is_downgrade = False
     headers = {
         'User-Agent': xbmc.getUserAgent()
     }
@@ -96,6 +97,7 @@ class Updater(object):
     def __init__(self, branch="develop_kodi21", mode="beta"):
         self.branch = branch
         self.mode = mode
+        self.is_downgrade = False
 
     @property
     def kodi_ver_name(self):
@@ -121,6 +123,7 @@ class Updater(object):
         return os.path.join(TEMP_PATH, self.archive_name)
 
     def check(self, current_version, allow_downgrade=False):
+        self.is_downgrade = False
         try:
             r = requests.get(self.info_url, timeout=10, headers=self.headers)
         except:
@@ -131,6 +134,8 @@ class Updater(object):
         if data:
             self.remote_version = new_version = data[0]
             vc = version_compare(new_version, current_version)
+            if allow_downgrade and vc < 0:
+                self.is_downgrade = True
             return new_version if vc > 0 or (allow_downgrade and vc != 0) else False
 
         raise UpdateCheckFailed('Update check failed: No data returned')

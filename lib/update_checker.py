@@ -73,6 +73,7 @@ def update_loop():
 
                     if update_version:
                         # notify user in main app and wait for response
+                        setGlobalProperty('update_is_downgrade', updater.is_downgrade and '1' or '', wait=True)
                         setGlobalProperty('update_available', update_version, wait=True)
 
                         try:
@@ -157,9 +158,7 @@ def update_loop():
                     setGlobalProperty('update_available', '')
                     setGlobalProperty('update_response', '')
                     setGlobalProperty('update_source_changed', '')
-
-            else:
-                xbmc.log('script.plexmod: Delaying update check', xbmc.LOGINFO)
+                    setGlobalProperty('update_is_downgrade', '')
 
         # tick every two seconds if home or settings windows are active, otherwise every 10
         interval = getGlobalProperty('active_window') in ("HomeWindow", "SettingsWindow") and 2 or 10
