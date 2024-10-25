@@ -24,14 +24,6 @@ import requests
 import plexnet.util
 
 from .kodijsonrpc import rpc
-# noinspection PyUnresolvedReferences
-from kodi_six import xbmc
-# noinspection PyUnresolvedReferences
-from kodi_six import xbmcgui
-# noinspection PyUnresolvedReferences
-from kodi_six import xbmcaddon
-# noinspection PyUnresolvedReferences
-from kodi_six import xbmcvfs
 
 from . import colors
 # noinspection PyUnresolvedReferences
@@ -40,18 +32,18 @@ from .logging import log, log_error
 # noinspection PyUnresolvedReferences
 from .i18n import T
 from . import aspectratio
-from .kodi_util import *
+# noinspection PyUnresolvedReferences
+from .kodi_util import (ADDON, xbmc, xbmcvfs, xbmcaddon, xbmcgui, translatePath, KODI_VERSION_MAJOR, KODI_VERSION_MINOR,
+                        KODI_BUILD_NUMBER, FROM_KODI_REPOSITORY, setGlobalProperty, setGlobalBoolProperty,
+                        waitForGPEmpty, waitForConsumption, getGlobalProperty)
 from plexnet import signalsmixin
 
 DEBUG = True
 _SHUTDOWN = False
 
-ADDON = xbmcaddon.Addon()
-
 SETTINGS_LOCK = threading.Lock()
 
 SKIN_PLEXTUARY = "skin.plextuary" in xbmc.getSkinDir()
-FROM_KODI_REPOSITORY = ADDON.getAddonInfo('name') == "PM4K for Plex"
 PROFILE = translatePath(ADDON.getAddonInfo('profile'))
 
 
@@ -145,6 +137,8 @@ def _processSetting(setting, default, is_json=False):
             return json.loads(setting)
         else:
             return default
+    elif isinstance(default, datetime.datetime):
+        return datetime.datetime.strptime(setting, '%Y-%m-%dT%H:%M:%S.%f')
 
     return setting
 
@@ -394,6 +388,8 @@ def _processSettingForWrite(value):
         value = binascii.hexlify(json.dumps(value))
     elif isinstance(value, bool):
         value = value and 'true' or 'false'
+    elif isinstance(value, datetime.datetime):
+        value = value.strftime('%Y-%m-%dT%H:%M:%S.%f')
     return str(value)
 
 
@@ -498,11 +494,12 @@ def simpleSize(size):
     Example: 12345 -> 12.06 KB
     """
     s = 0
+    i = 0
     if size > 0:
         i = int(math.floor(math.log(size, 1024)))
         p = math.pow(1024, i)
         s = round(size / p, 2)
-    if (s > 0):
+    if s > 0:
         return '%s %s' % (s, SIZE_NAMES[i])
     else:
         return '0B'

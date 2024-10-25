@@ -1,6 +1,9 @@
 # coding=utf-8
 
-from kodi_six import xbmc, xbmcgui, xbmcvfs
+# noinspection PyUnresolvedReferences
+from kodi_six import xbmc, xbmcgui, xbmcvfs, xbmcaddon
+
+ADDON = xbmcaddon.Addon()
 
 
 _build = None
@@ -35,6 +38,8 @@ if not parsedBuild:
 # calculate a comparable build number
 KODI_BUILD_NUMBER = int("{0}{1:02d}{2:03d}".format(_bmajor, int(_bminor), int(_bpatch)))
 
+FROM_KODI_REPOSITORY = ADDON.getAddonInfo('name') == "PM4K for Plex"
+
 
 if KODI_VERSION_MAJOR > 18:
     translatePath = xbmcvfs.translatePath
@@ -55,8 +60,57 @@ def setGlobalBoolProperty(key, boolean, base='script.plex.{0}'):
     xbmcgui.Window(10000).setProperty(base.format(key), boolean and '1' or '')
 
 
-def getGlobalProperty(key):
-    return xbmc.getInfoLabel('Window(10000).Property(script.plex.{0})'.format(key))
+
+class IPCException(Exception):
+    def __init__(self, msg, status_code=None):
+        self.msg = msg
+        self.status_code = status_code
+
+    def __str__(self):
+        return '{}: {}'.format(self.msg, self.status_code)
+
+
+class IPCTimeoutException(IPCException):
+    pass
+
+
+def getGlobalProperty(key, consume=False, wait=False, interval=0.1, timeout=36000, monitor_cls=xbmc.Monitor):
+    resp = xbmc.getInfoLabel('Window(10000).Property(script.plex.{0})'.format(key))
+    if wait and not resp:
+        waited = 0
+        monitor = monitor_cls()
+        while not monitor.abortRequested() and not resp and waited < timeout:
+            if monitor.waitForAbort(interval):
+                break
+            resp = xbmc.getInfoLabel('Window(10000).Property(script.plex.{0})'.format(key))
+            waited += 1
+
+        if waited >= timeout:
+            # timed out
+            raise IPCTimeoutException('Timed out while waiting for: {}'.format(key))
+
+    if consume:
+        setGlobalProperty(key, '', wait=wait)
+
+    return resp
+
+
+def waitForGPEmpty(key, interval=0.1, timeout=36000, monitor_cls=xbmc.Monitor):
+    resp = xbmc.getInfoLabel('Window(10000).Property(script.plex.{0})'.format(key))
+    if resp:
+        waited = 0
+        monitor = monitor_cls()
+        while not monitor.abortRequested() and resp and waited < timeout:
+            if monitor.waitForAbort(interval):
+                break
+            resp = xbmc.getInfoLabel('Window(10000).Property(script.plex.{0})'.format(key))
+            waited += 1
+        if waited >= timeout:
+            raise IPCTimeoutException('Timed out while waiting for emptiness of: {}'.format(key))
+    return True
+
+
+waitForConsumption = waitForGPEmpty
 
 
 def ensureHome():

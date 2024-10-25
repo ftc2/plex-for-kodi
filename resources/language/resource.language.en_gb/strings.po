@@ -2339,3 +2339,55 @@ msgstr ""
 msgctxt "#33669"
 msgid "Really sign out?"
 msgstr ""
+
+msgctxt "#33670"
+msgid "Update available"
+msgstr ""
+
+msgctxt "#33671"
+msgid "Current: {current_version}\nNew: {new_version}"
+msgstr ""
+
+msgctxt "#33672"
+msgid "Check for updates"
+msgstr ""
+
+msgctxt "#33673"
+msgid "Automatically check for updates periodically. If installed from a Kodi repository and the Update Source setting is set to Repository, Kodi itself will handle the updating of this addon. Needs a Kodi restart when changed."
+msgstr ""
+
+msgctxt "#33674"
+msgid "Check for updates on Start"
+msgstr ""
+
+msgctxt "#33675"
+msgid "Automatically check for updates on startup. Needs a Kodi restart when changed."
+msgstr ""
+
+msgctxt "#33676"
+msgid "Update source"
+msgstr ""
+
+msgctxt "#33677"
+msgid "Specifies the update mode. Will immediately check for a new version when changed and closing settings.\nDefault: Repository\n\nBeta: Bleeding edge (possibly unstable)\nStable: Stable branch (faster than Repository)\nRepository: Kodi repository (official (slow) or Don't Panic)"
+msgstr ""
+
+msgctxt "#33678"
+msgid "Beta"
+msgstr ""
+
+msgctxt "#33679"
+msgid "Stable"
+msgstr ""
+
+msgctxt "#33680"
+msgid "Repository"
+msgstr ""
+
+msgctxt "#33681"
+msgid "Major changes detected"
+msgstr ""
+
+msgctxt "#33682"
+msgid "The update that has just been installed has major changes. A Kodi restart is necessary. You can still try running the addon, but it isn't guaranteed to be stable, especially when you've downgraded. Do you still want to run the addon?"
+msgstr ""

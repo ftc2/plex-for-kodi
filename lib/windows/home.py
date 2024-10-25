@@ -416,6 +416,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         self._restarting = False
         self._anyItemAction = False
         self._odHubsDirty = False
+        self._updateSourceChanged = False
         self.librarySettings = None
         self.hubSettings = None
         self.anyLibraryHidden = False
@@ -691,6 +692,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         plexapp.util.APP.on('change:hubs_use_new_continue_watching', self.setDirty)
         plexapp.util.APP.on('change:path_mapping_indicators', self.setDirty)
         plexapp.util.APP.on('change:debug', self.setDebugFlag)
+        plexapp.util.APP.on('change:update_source', self.updateSourceChanged)
         plexapp.util.APP.on('theme_relevant_setting', self.setThemeDirty)
 
         player.PLAYER.on('session.ended', self.updateOnDeckHubs)
@@ -718,6 +720,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         plexapp.util.APP.off('change:hubs_use_new_continue_watching', self.setDirty)
         plexapp.util.APP.off('change:path_mapping_indicators', self.setDirty)
         plexapp.util.APP.off('change:debug', self.setDebugFlag)
+        plexapp.util.APP.off('change:update_source', self.updateSourceChanged)
         plexapp.util.APP.off('theme_relevant_setting', self.setThemeDirty)
 
         player.PLAYER.off('session.ended', self.updateOnDeckHubs)
@@ -728,7 +731,46 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         util.MONITOR.off('system.sleep', self.disableUpdates)
         util.MONITOR.off('system.wakeup', self.onWake)
 
+
+    def updateSourceChanged(self, value, **kwargs):
+        self._updateSourceChanged = value
+
+
+    def service_responder(self):
+        if util.getGlobalProperty('update_available'):
+            button = optionsdialog.show(
+                T(33670, 'Update available'),
+                T(33671, 'Current: {current_version}\nNew: {new_version}').format(
+                    current_version=util.ADDON.getAddonInfo('version'),
+                    new_version=util.getGlobalProperty('update_available'),
+                ),
+                T(32328, 'Yes'),
+                T(32329, 'No')
+            )
+            if button == 0:
+                resp = "commence"
+            else:
+                resp = "cancel"
+            util.setGlobalProperty('update_response', resp, wait=True)
+            util.setGlobalProperty('update_available', '', wait=True)
+
+            if resp == "commence":
+                # wait for it to be consumed
+                util.waitForConsumption('update_response', timeout=20)
+
+                self._shuttingDown = True
+                #self.closeOption = "update"
+                self.doClose()
+                return True
+
     def tick(self):
+        if self.service_responder():
+            return
+
+        if self._updateSourceChanged:
+            util.setGlobalProperty('update_source_changed', self._updateSourceChanged, wait=True)
+            self._updateSourceChanged = False
+
         if not self.lastSection or self._ignoreTick:
             return
 

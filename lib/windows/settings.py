@@ -793,7 +793,24 @@ class Settings(object):
         ),
         'system': (
             T(33600, 'System'), (
-
+                BoolSetting('auto_update_check', T(33672, 'Check for updates'), True)
+                .description(T(33673, "Automatically check for updates periodically. If installed from a "
+                                      "Kodi repository and the Update Source setting is set to Repository, Kodi "
+                                      "itself will handle the updating of this addon. "
+                                      "Needs a Kodi restart when changed.")),
+                BoolSetting('update_check_startup', T(33674, 'Check for updates on Start'), True)
+                .description(T(33675, "Automatically check for updates on startup. "
+                                      "Needs a Kodi restart when changed.")),
+                OptionsSetting(
+                    'update_source',
+                    T(33676, 'Update source'),
+                    'repository',
+                    (('beta', T(33678, 'Beta')), ('stable', T(33679, 'Stable')),
+                     ('repository', T(33680, 'Repository')))
+                ).description(T(33677, 'Specifies the update mode. Will immediately check for a new version '
+                                       'when changed and closing settings.\nDefault: Repository\n\nBeta: Bleeding '
+                                       'edge (possibly unstable)\nStable: Stable branch (faster than Repository)\n'
+                                       'Repository: Kodi repository (official (slow) or Don\'t Panic)')),
                 BoolSetting('exit_default_is_quit', T(32965, 'Start Plex On Kodi Startup'), False)
                 .description(T(32966, "stub")),
                 BoolSetting('path_mapping', T(33000, ''), True).description(T(33001, '')),

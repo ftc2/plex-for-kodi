@@ -215,6 +215,7 @@ class BaseWindow(XMLBase, xbmcgui.WindowXML, BaseFunctions):
                 if hasattr(self, "onFirstInit"):
                     self.onFirstInit()
                 self.finishedInit = True
+            util.setGlobalProperty('active_window', self.__class__.__name__)
 
         except util.NoDataException:
             self.exitCommand = "NODATA"
