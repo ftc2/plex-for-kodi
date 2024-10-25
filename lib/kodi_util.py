@@ -126,3 +126,7 @@ def ensureHome():
             ct += 1
         if ct > 50:
             xbmc.log("Still active window: {}", xbmc.LOGINFO)
+
+
+def log(msg, level=xbmc.LOGINFO, realm="Updater"):
+    xbmc.log('script.plexmod/{}: {}'.format(realm, msg), level)
