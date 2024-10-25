@@ -157,6 +157,7 @@ class Updater(object):
             raise UpdateDownloadFailed('Update download failed', status_code=result.status_code)
 
         with open(zip_loc, 'wb') as f:
+            result.raw.decode_content = True
             shutil.copyfileobj(result.raw, f)
 
         return zip_loc
