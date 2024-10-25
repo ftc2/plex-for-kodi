@@ -58,7 +58,7 @@ PROFILE = translatePath(ADDON.getAddonInfo('profile'))
 DEF_THEME = "modern-colored"
 THEME_VERSION = 34
 
-xbmc.log('script.plex: Kodi {0}.{1} (build {2})'.format(KODI_VERSION_MAJOR, KODI_VERSION_MINOR, KODI_BUILD_NUMBER),
+xbmc.log('script.plexmod: Kodi {0}.{1} (build {2})'.format(KODI_VERSION_MAJOR, KODI_VERSION_MINOR, KODI_BUILD_NUMBER),
          xbmc.LOGINFO)
 
 
@@ -1036,7 +1036,7 @@ def dumpSettings():
         all_settings = SETTING_RE.findall(data)
         f.close()
     except:
-        LOG('script.plex: No settings.xml found')
+        LOG('script.plexmod: No settings.xml found')
         return
 
     final = OrderedDict({"settings": OrderedDict((k, []) for k in sections), "addon_settings": [], "unspecified": []})
