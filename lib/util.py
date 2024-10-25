@@ -5,7 +5,6 @@ import gc
 import os
 import sys
 import re
-import binascii
 import json
 import threading
 import math
@@ -36,12 +35,12 @@ from . import aspectratio
 from .kodi_util import (ADDON, xbmc, xbmcvfs, xbmcaddon, xbmcgui, translatePath, KODI_VERSION_MAJOR, KODI_VERSION_MINOR,
                         KODI_BUILD_NUMBER, FROM_KODI_REPOSITORY, setGlobalProperty, setGlobalBoolProperty,
                         waitForGPEmpty, waitForConsumption, getGlobalProperty)
+# noinspection PyUnresolvedReferences
+from .settings_util import getSetting, getUserSetting, setSetting, USER_SETTINGS, JSON_SETTINGS
 from plexnet import signalsmixin
 
 DEBUG = True
 _SHUTDOWN = False
-
-SETTINGS_LOCK = threading.Lock()
 
 SKIN_PLEXTUARY = "skin.plextuary" in xbmc.getSkinDir()
 PROFILE = translatePath(ADDON.getAddonInfo('profile'))
@@ -96,52 +95,6 @@ CURRENT_AR = DISPLAY_RESOLUTION[0] / DISPLAY_RESOLUTION[1]
 
 # we currently only support vertical scaling for smaller ARs; change to != once we know how to scale horizontally
 NEEDS_SCALING = round(CURRENT_AR, 2) < round(1920 / 1080, 2)
-
-
-def getSetting(key, default=None):
-    with SETTINGS_LOCK:
-        setting = ADDON.getSetting(key)
-        is_json = key in JSON_SETTINGS
-        return _processSetting(setting, default, is_json=is_json)
-
-
-def getUserSetting(key, default=None):
-    if not plexnet.util.ACCOUNT:
-        return default
-
-    is_json = key in JSON_SETTINGS
-
-    key = '{}.{}'.format(key, plexnet.util.ACCOUNT.ID)
-    with SETTINGS_LOCK:
-        setting = ADDON.getSetting(key)
-        return _processSetting(setting, default, is_json=is_json)
-
-
-JSON_SETTINGS = []
-USER_SETTINGS = []
-
-
-def _processSetting(setting, default, is_json=False):
-    if not setting:
-        return default
-    if isinstance(default, bool):
-        return setting.lower() == 'true'
-    elif isinstance(default, float):
-        return float(setting)
-    elif isinstance(default, int):
-        return int(float(setting or 0))
-    elif isinstance(default, list):
-        if setting and not is_json:
-            return json.loads(binascii.unhexlify(setting))
-        elif setting and is_json:
-            return json.loads(setting)
-        else:
-            return default
-    elif isinstance(default, datetime.datetime):
-        return datetime.datetime.strptime(setting, '%Y-%m-%dT%H:%M:%S.%f')
-
-    return setting
-
 
 HOME_BUTTON_MAPPED = None
 
@@ -375,22 +328,6 @@ def reInitAddon():
     ADDON = xbmcaddon.Addon()
     getAdvancedSettings()
     populateTimeFormat()
-
-
-def setSetting(key, value):
-    with SETTINGS_LOCK:
-        value = _processSettingForWrite(value)
-        ADDON.setSetting(key, value)
-
-
-def _processSettingForWrite(value):
-    if isinstance(value, list):
-        value = binascii.hexlify(json.dumps(value))
-    elif isinstance(value, bool):
-        value = value and 'true' or 'false'
-    elif isinstance(value, datetime.datetime):
-        value = value.strftime('%Y-%m-%dT%H:%M:%S.%f')
-    return str(value)
 
 
 def showNotification(message, time_ms=3000, icon_path=None, header=ADDON.getAddonInfo('name')):

@@ -5,7 +5,8 @@ import json
 
 from lib.kodi_util import (xbmc, xbmcgui, ADDON, IPCTimeoutException, waitForGPEmpty,
                            setGlobalProperty, getGlobalProperty, KODI_VERSION_MAJOR)
-from lib.util import getSetting, setSetting, T
+from lib.settings_util import getSetting, setSetting
+from lib.i18n import T
 from lib.logging import service_log as log
 
 
