@@ -798,8 +798,9 @@ class Settings(object):
                                       "Kodi repository and the Update Source setting is set to Repository, Kodi "
                                       "itself will handle the updating of this addon. "
                                       "Needs a Kodi restart when changed.")),
-                BoolSetting('update_check_startup', T(33674, 'Check for updates on Start'), True)
+                BoolSetting('update_check_startup', T(33674, 'Check for updates on start'), True)
                 .description(T(33675, "Automatically check for updates on startup. "
+                                      "Doesn't do much when Update source is Repository."
                                       "Needs a Kodi restart when changed.")),
                 OptionsSetting(
                     'update_source',
