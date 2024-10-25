@@ -2389,5 +2389,13 @@ msgid "Major changes detected"
 msgstr ""
 
 msgctxt "#33682"
-msgid "The update that has just been installed has major changes. A Kodi restart is necessary. You can still try running the addon, but it isn't guaranteed to be stable, especially when you've downgraded. Do you still want to run the addon?"
+msgid "The update {} has major changes. A Kodi restart could be necessary. You can still try running the addon, but it isn't guaranteed to be stable, especially when you've downgraded. Do you still want to run the addon?"
+msgstr ""
+
+msgctxt "#33683"
+msgid "Exit, download and install"
+msgstr ""
+
+msgctxt "#33684"
+msgid "Later"
 msgstr ""

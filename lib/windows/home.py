@@ -744,8 +744,8 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                     current_version=util.ADDON.getAddonInfo('version'),
                     new_version=util.getGlobalProperty('update_available'),
                 ),
-                T(32328, 'Yes'),
-                T(32329, 'No')
+                T(33683, 'Exit, download and install'),
+                T(33684, 'Later')
             )
             if button == 0:
                 resp = "commence"
@@ -767,7 +767,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         if self.service_responder():
             return
 
-        if self._updateSourceChanged:
+        if self.is_active and self._updateSourceChanged:
             util.setGlobalProperty('update_source_changed', self._updateSourceChanged, wait=True)
             self._updateSourceChanged = False
 

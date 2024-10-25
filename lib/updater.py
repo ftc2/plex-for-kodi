@@ -198,9 +198,11 @@ class Updater(object):
                 get_digest(os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", "service.py")):
             return "service"
 
-    def install(self):
-        xbmc.log("BUBU: %s" % translatePath('special://home/addons/'), xbmc.LOGINFO)
-        return True
+    def install(self, path):
+        dest = os.path.join(translatePath('special://home/addons/'), "script.plexmod")
+        shutil.rmtree(dest, ignore_errors=True)
+        shutil.move(path, dest)
+        return dest
 
     def cleanup(self):
         try:
