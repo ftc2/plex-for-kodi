@@ -195,8 +195,9 @@ class Updater(object):
     def get_major_changes(self):
         # check current language file
         ptl = ("resources", "language", LANGUAGE_RESOURCE, "strings.po")
-        if get_digest(os.path.join(translatePath(ADDON.getAddonInfo('path')), *ptl)) != \
-            get_digest(os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", *ptl)):
+        ptr1 = os.path.join(translatePath(ADDON.getAddonInfo('path')), *ptl)
+        ptr2 = os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", *ptl)
+        if os.path.exists(ptr1) and os.path.exists(ptr2) and get_digest(ptr1) != get_digest(ptr2):
             return "language"
 
         # check service.py

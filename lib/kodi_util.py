@@ -5,7 +5,6 @@ from kodi_six import xbmc, xbmcgui, xbmcvfs, xbmcaddon
 
 ADDON = xbmcaddon.Addon()
 
-
 _build = None
 # buildversion looks like: XX.X[-TAG] (a+.b+.c+) (.+); there are kodi builds that don't set the build version
 sys_ver = xbmc.getInfoLabel('System.BuildVersion')
@@ -45,6 +44,9 @@ if KODI_VERSION_MAJOR > 18:
     translatePath = xbmcvfs.translatePath
 else:
     translatePath = xbmc.translatePath
+
+
+ICON_PATH = translatePath(ADDON.getAddonInfo('icon'))
 
 
 def setGlobalProperty(key, val, base='script.plex.{0}', wait=False):

@@ -34,6 +34,8 @@ if argvlen > 1:
     from_kiosk = bool(int(sys.argv[1]))
     if argvlen > 2:
         boot_delay = int(sys.argv[2])
+        if argvlen > 3:
+            update_successful = bool(int(sys.argv[3]))
 
 started = False
 set_waiting_for_start = False

@@ -2,8 +2,9 @@
 import os
 import datetime
 import json
+import traceback
 
-from lib.kodi_util import (xbmc, xbmcgui, ADDON, IPCTimeoutException, waitForGPEmpty,
+from lib.kodi_util import (xbmc, xbmcgui, ADDON, IPCTimeoutException, waitForGPEmpty, ICON_PATH,
                            setGlobalProperty, getGlobalProperty, KODI_VERSION_MAJOR)
 from lib.settings_util import getSetting, setSetting
 from lib.i18n import T
@@ -63,16 +64,21 @@ def update_loop():
             if should_check():
                 addon_version = ADDON.getAddonInfo('version')
                 try:
+                    pd = None
                     if check_immediate:
                         check_immediate = False
 
                     log('Checking for updates')
                     update_version = updater.check(addon_version, allow_downgrade=allow_downgrade)
+                    log('Current: {}, Latest: {}, Update/Sidegrade/Downgrade: {}'.format(addon_version,
+                                                                                         updater.remote_version,
+                                                                                         update_version))
 
                     last_update_check = datetime.datetime.now()
                     setSetting('last_update_check', last_update_check)
 
                     if update_version:
+                        log("Update found: {}".format(update_version))
                         # notify user in main app and wait for response
                         setGlobalProperty('update_is_downgrade', updater.is_downgrade and '1' or '', wait=True)
                         setGlobalProperty('update_available', update_version, wait=True)
@@ -81,7 +87,7 @@ def update_loop():
                             resp = getGlobalProperty('update_response', consume=True, wait=True)
                         except IPCTimeoutException:
                             # timed out
-                            raise UpdateException('No user response')
+                            raise UpdaterSkipException('No user response')
 
                         log("User response: {}".format(resp))
 
@@ -147,7 +153,7 @@ def update_loop():
                                 #disable_enable_addon()
 
                                 if do_start:
-                                    xbmc.executebuiltin('RunScript(script.plexmod)')
+                                    xbmc.executebuiltin('RunScript(script.plexmod,0,0,1)')
 
                 except UpdateException as e:
                     log(e, xbmc.LOGWARNING)
@@ -155,11 +161,28 @@ def update_loop():
                 except UpdaterSkipException:
                     log("Update skipped")
 
+                except Exception as e:
+                    log(traceback.format_exc(), xbmc.LOGERROR)
+                    xbmc.executebuiltin('Notification({0},"{1}",{2},{3})'.format("Update",
+                                                                               "Update failed, see log, not starting.",
+                                                                               5000,
+                                                                               ICON_PATH))
+
                 finally:
                     setGlobalProperty('update_available', '')
                     setGlobalProperty('update_response', '')
                     setGlobalProperty('update_source_changed', '')
                     setGlobalProperty('update_is_downgrade', '')
+                    # lel
+                    try:
+                        if pd:
+                            try:
+                                pd.close()
+                                del pd
+                            except:
+                                pass
+                    except:
+                        pass
 
         # tick every two seconds if home or settings windows are active, otherwise every 10
         interval = getGlobalProperty('active_window') in ("HomeWindow", "SettingsWindow") and 2 or 10
