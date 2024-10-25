@@ -32,3 +32,8 @@ def log_error(txt='', hide_tb=False):
         xbmc.log('    ' + l, xbmc.LOGERROR)
     xbmc.log("_________________________________________________________________________________", xbmc.LOGERROR)
     xbmc.log("`", xbmc.LOGERROR)
+
+
+
+def service_log(msg, level=xbmc.LOGINFO, realm="Updater"):
+    xbmc.log('script.plexmod/{}: {}'.format(realm, msg), level)
