@@ -81,9 +81,9 @@ class PlexPlayer(BasePlayer):
         else:
             directPlay = directPlayPref == "forced" and True or None
 
-        return self._build(directPlay, "playback_remux" in features)
+        return self._build(directPlay, "playback_remux" in features, features=features)
 
-    def _build(self, directPlay=None, directStream=True, currentPartIndex=None):
+    def _build(self, directPlay=None, directStream=True, currentPartIndex=None, features=None):
         isForced = directPlay is not None
         if isForced:
             util.LOG(directPlay and "Forced Direct Play" or "Forced Transcode; allowDirectStream={0}".format(directStream))
@@ -158,7 +158,8 @@ class PlexPlayer(BasePlayer):
                 transcodeServer = self.item.getTranscodeServer(True, "video")
                 if transcodeServer is None:
                     return None
-                partObj = self.buildTranscode(transcodeServer, partObj, partIndex, directStream, isCurrentPart)
+                partObj = self.buildTranscode(transcodeServer, partObj, partIndex, directStream, isCurrentPart,
+                                              features=features)
 
             # Set up our linked list references. If we couldn't build an actual
             # object: fail fast. Otherwise, see if we're at our start offset
@@ -617,7 +618,7 @@ class PlexPlayer(BasePlayer):
 
         return None
 
-    def buildTranscode(self, server, obj, partIndex, directStream, isCurrentPart):
+    def buildTranscode(self, server, obj, partIndex, directStream, isCurrentPart, features=None):
         util.DEBUG_LOG('buildTranscode()')
         obj.transcodeServer = server
         obj.isTranscoded = True
@@ -680,8 +681,8 @@ class PlexPlayer(BasePlayer):
         builder.addParam("directPlay", "0")
 
         qualityIndex = self.item.settings.getQualityIndex(self.item.getQualityType(server))
-        builder.addParam("videoQuality", self.item.settings.getGlobal("transcodeVideoQualities")[qualityIndex])
-        builder.addParam("videoResolution", str(self.item.settings.getGlobal("transcodeVideoResolutions")[qualityIndex]))
+        #builder.addParam("videoQuality", self.item.settings.getGlobal("transcodeVideoQualities")[qualityIndex])
+        builder.addParam("videoResolution", str("allow_4k" in features and 2160 or 1088))
         builder.addParam("maxVideoBitrate", self.item.settings.getGlobal("transcodeVideoBitrates")[qualityIndex])
 
         if self.media.mediaIndex is not None:
