@@ -270,10 +270,16 @@ class PlexPlayer(BasePlayer):
         if not self.item or not self.metadata:
             return None
 
+        features = self.item.settings.getPlaybackFeatures()
+
         decisionPath = self.metadata.decisionPath
         if not decisionPath:
             server = self.metadata.transcodeServer or self.item.getServer()
-            decisionPath = self.buildTranscode(server, util.AttributeDict(), self.metadata.partIndex, True, False).decisionPath
+            decisionPath = self.buildTranscode(server, util.AttributeDict(),
+                                               self.metadata.partIndex,
+                                               True,
+                                               False,
+                                               features=features).decisionPath
 
         # Modify the decision params based on the transcode url
         if decisionPath:
@@ -682,8 +688,13 @@ class PlexPlayer(BasePlayer):
 
         qualityIndex = self.item.settings.getQualityIndex(self.item.getQualityType(server))
         #builder.addParam("videoQuality", self.item.settings.getGlobal("transcodeVideoQualities")[qualityIndex])
-        builder.addParam("videoResolution", str("allow_4k" in features and 2160 or 1088))
+        maxVideoResolution = "allow_4k" in features and 2160 or 1088
+        builder.addParam("videoResolution", str(maxVideoResolution))
         builder.addParam("maxVideoBitrate", self.item.settings.getGlobal("transcodeVideoBitrates")[qualityIndex])
+
+        builder.extras.append(
+            "add-limitation(scope=videoCodec&scopeName=*&context=streaming&protocol=http&"
+            "type=upperBound&name=video.height&value={}&isRequired=true)".format(maxVideoResolution))
 
         if self.media.mediaIndex is not None:
             builder.addParam("mediaIndex", str(self.media.mediaIndex))
