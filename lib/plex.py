@@ -113,10 +113,11 @@ class PlexInterface(plexapp.AppInterface):
             plexapp.Res((1024, 768)),
             plexapp.Res((1280, 720)),
             plexapp.Res((1280, 720)),
-            maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes
+            maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes, maxVideoRes
         ],
         'transcodeVideoBitrates': [
-            "64", "96", "208", "320", "720", "1500", "2000", "3000", "4000", "8000", "10000", "12000", "20000", "0"
+            "64", "96", "208", "320", "720", "1500", "2000", "3000", "4000", "6000", "8000", "10000", "12000", "16000",
+            "20000", "26000", "0"
         ],
         'deviceInfo': plexapp.DeviceInfo()
     }
@@ -238,11 +239,11 @@ class PlexInterface(plexapp.AppInterface):
 
     def getQualityIndex(self, qualityType):
         if qualityType == self.QUALITY_LOCAL:
-            return self.getPreference("local_quality", 13)
+            return self.getPreference("local_quality2", 16)
         elif qualityType == self.QUALITY_ONLINE:
-            return self.getPreference("online_quality", 13)
+            return self.getPreference("online_quality2", 16)
         else:
-            return self.getPreference("remote_quality", 13)
+            return self.getPreference("remote_quality2", 16)
 
     def getMaxResolution(self, quality_type, allow4k=False):
         qualityIndex = self.getQualityIndex(quality_type)

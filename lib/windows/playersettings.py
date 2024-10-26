@@ -92,13 +92,14 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
     def showSettings(self, init=False):
         video = self.video
         override = self.qualityOverride
-        if override is not None and override < 13:
-            current = T((32001, 32002, 32003, 32004, 32005, 32006, 32007, 32008, 32009, 32010, 32011, 32012, 32013, 32014)[13 - override])
+        if override is not None and override < 16:
+            current = T((32001, 32017, 32002, 32016, 32003, 32004, 32005, 32015, 32006, 32007, 32008, 32009, 32010,
+                         32011)[16 - override])
         else:
             current = u'{0} {1} ({2})'.format(
                 plexnet.util.bitrateToString(video.mediaChoice.media.bitrate.asInt() * 1000),
                 video.mediaChoice.media.getVideoResolutionString(),
-                video.mediaChoice.media.title or 'Original'
+                video.mediaChoice.media.title or T(32001, 'Original')
             )
 
         audio, subtitle = self.getAudioAndSubtitleInfo()
@@ -188,8 +189,8 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
         elif result == 'quality':
             idx = None
             override = self.qualityOverride
-            if override is not None and override < 13:
-                idx = 13 - override
+            if override is not None and override < 16:
+                idx = 16 - override
             showQualityDialog(self.video, non_playback=self.nonPlayback, selected_idx=idx)
         elif result == 'kodi_video':
             xbmc.executebuiltin('ActivateWindow(OSDVideoSettings)')
@@ -350,16 +351,22 @@ def showSubtitlesDialog(video, non_playback=False):
 
 
 def showQualityDialog(video, non_playback=False, selected_idx=None):
-    options = [(13 - i, T(l)) for (i, l) in enumerate((32001, 32002, 32003, 32004, 32005, 32006, 32007, 32008, 32009,
-                                                       32010, 32011))]
+    options = [(15 - i, T(l)) for (i, l) in enumerate((32017, 32002, 32016, 32003, 32004, 32005, 32015, 32006,
+                                                       32007, 32008, 32009, 32010, 32011))]
+
+    options.insert(0, (16, u'{0} {1} ({2})'.format(
+                plexnet.util.bitrateToString(video.mediaChoice.media.bitrate.asInt() * 1000),
+                video.mediaChoice.media.getVideoResolutionString(),
+                T(32001, 'Original')
+            )))
 
     choice = showOptionsDialog('Quality', options, non_playback=non_playback, selected_idx=selected_idx)
     if choice is None:
         return
 
-    video.settings.setPrefOverride('local_quality', choice)
-    video.settings.setPrefOverride('remote_quality', choice)
-    video.settings.setPrefOverride('online_quality', choice)
+    video.settings.setPrefOverride('local_quality2', choice)
+    video.settings.setPrefOverride('remote_quality2', choice)
+    video.settings.setPrefOverride('online_quality2', choice)
 
 
 def showDialog(video, non_playback=False, via_osd=False, parent=None):

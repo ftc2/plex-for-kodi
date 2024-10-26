@@ -119,10 +119,13 @@ class ListSetting(BasicSetting):
 class QualitySetting(ListSetting):
     options = (
         T(32001),
+        T(32017),
         T(32002),
+        T(32016),
         T(32003),
         T(32004),
         T(32005),
+        T(32015),
         T(32006),
         T(32007),
         T(32008),
@@ -440,9 +443,9 @@ class Settings(object):
         ),
         'video': (
             T(32053, 'Video'), (
-                QualitySetting('local_quality', T(32020, 'Local Quality'), 13),
-                QualitySetting('remote_quality', T(32021, 'Remote Quality'), 13),
-                QualitySetting('online_quality', T(32022, 'Online Quality'), 13),
+                QualitySetting('local_quality2', T(32020, 'Local Quality'), 16),
+                QualitySetting('remote_quality2', T(32021, 'Remote Quality'), 16),
+                QualitySetting('online_quality2', T(32022, 'Online Quality'), 16),
                 MultiOptionsSetting(
                     'playback_features', T(33058, ''),
                     ["playback_directplay", "playback_remux", "allow_4k"],
@@ -1279,16 +1282,16 @@ def showSubtitlesDialog(video):
 
 
 def showQualityDialog(video):
-    options = [(13 - i, T(l)) for (i, l) in enumerate((32001, 32002, 32003, 32004, 32005, 32006, 32007, 32008, 32009,
-                                                       32010, 32011))]
+    options = [(16 - i, T(l)) for (i, l) in enumerate((32001, 32017, 32002, 32016, 32003, 32004, 32005, 32015, 32006,
+                                                       32007, 32008, 32009, 32010, 32011))]
 
     choice = showOptionsDialog(T(32397, 'Quality'), options)
     if choice is None:
         return
 
-    video.settings.setPrefOverride('local_quality', choice)
-    video.settings.setPrefOverride('remote_quality', choice)
-    video.settings.setPrefOverride('online_quality', choice)
+    video.settings.setPrefOverride('local_quality2', choice)
+    video.settings.setPrefOverride('remote_quality2', choice)
+    video.settings.setPrefOverride('online_quality2', choice)
 
 
 def openWindow():

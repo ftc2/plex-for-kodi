@@ -73,6 +73,18 @@ msgctxt "#32014"
 msgid "64 kbps"
 msgstr ""
 
+msgctxt "#32015"
+msgid "6 Mbps"
+msgstr ""
+
+msgctxt "#32016"
+msgid "16 Mbps"
+msgstr ""
+
+msgctxt "#32017"
+msgid "26 Mbps"
+msgstr ""
+
 msgctxt "#32020"
 msgid "Local Quality"
 msgstr ""
