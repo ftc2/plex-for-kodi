@@ -2391,24 +2391,24 @@ msgstr ""
 #: Update mode as in (beta, stable, repository)
 msgctxt "#33679"
 msgid "Stable"
-msgstr "Stable"
+msgstr ""
 
 msgctxt "#33680"
 msgid "Repository"
-msgstr "Repository"
+msgstr ""
 
 msgctxt "#33681"
 msgid "Major changes detected"
-msgstr "Signifikante Änderungen vorhanden"
+msgstr ""
 
 msgctxt "#33682"
 msgid "The update {} has major changes. A Kodi restart could be necessary. You can still try running the addon, but it isn't guaranteed to be stable, especially when you've downgraded. Do you still want to run the addon?"
-msgstr "Das Update {} beinhaltet signifikante Änderungen. Ein Kodi-Neustart könnte notwendig sein. Das Addon kann trotzdem ausgeführt werden, das kann allerdings zu Fehlern führen, insbesondere wenn ein Downgrade durchgeführt wurde. Das Addon trotzdem starten?"
+msgstr ""
 
 msgctxt "#33683"
 msgid "Exit, download and install"
-msgstr "Beenden, herunterladen und installieren"
+msgstr ""
 
 msgctxt "#33684"
 msgid "Later"
-msgstr "Später"
+msgstr ""
