@@ -84,9 +84,14 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
             self.doClose()
             return
 
+    @property
+    def qualityOverride(self):
+        quality_type = self.video.getQualityType()
+        return self.video.settings.getPrefOverride(quality_type, self.video.settings.getQualityIndex(quality_type))
+
     def showSettings(self, init=False):
         video = self.video
-        override = video.settings.getPrefOverride('local_quality')
+        override = self.qualityOverride
         if override is not None and override < 13:
             current = T((32001, 32002, 32003, 32004, 32005, 32006, 32007, 32008, 32009, 32010, 32011, 32012, 32013, 32014)[13 - override])
         else:
@@ -182,7 +187,7 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
             showSubtitlesDialog(self.video, non_playback=self.nonPlayback)
         elif result == 'quality':
             idx = None
-            override = self.video.settings.getPrefOverride('local_quality')
+            override = self.qualityOverride
             if override is not None and override < 13:
                 idx = 13 - override
             showQualityDialog(self.video, non_playback=self.nonPlayback, selected_idx=idx)
