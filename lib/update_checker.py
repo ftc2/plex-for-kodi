@@ -132,15 +132,25 @@ def update_loop():
 
                                 do_start = True
                                 if has_major_changes:
+                                    log("Major changes detected, prompting the user: {}".format(has_major_changes))
+
                                     kw = {}
                                     if KODI_VERSION_MAJOR >= 20:
                                         kw = {'defaultbutton': xbmcgui.DLG_YESNO_YES_BTN}
                                     do_start = xbmcgui.Dialog().yesno(
-                                        T(33681, 'Major changes detected'),
-                                        T(33682, 'The update {} has major changes. '
-                                                 'A Kodi restart could be necessary. You can still try running the'
-                                                 ' addon, but it isn\'t guaranteed to be stable, especially when you\'ve '
-                                                 'downgraded. Do you still want to run the addon?').format(update_version),
+                                        T(33681, 'Service updated')
+                                        if has_major_changes == "service" else
+                                        T(33687, 'Translation updated'),
+                                        (T(33682, 'The update {} has had changes to the updater itself. In '
+                                                  'order for the updated updater service to work, a Kodi restart is '
+                                                  'necessary. The addon will work normally, though. Do you still '
+                                                  'want to run the addon?')
+                                         if has_major_changes == "service" else
+                                         T(33688, 'The currently in-use translation has been updated. In '
+                                                  'order to load the new translation, a Kodi restart is necessary. '
+                                                  'The addon will still run properly, but you might see badly or '
+                                                  'untranslated strings. Do you still want to run the addon?')
+                                         ).format(update_version),
                                         nolabel=T(32329, "No"),
                                         yeslabel=T(32328, "Yes"),
                                         **kw
