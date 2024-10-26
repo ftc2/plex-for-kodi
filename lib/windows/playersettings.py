@@ -351,11 +351,27 @@ def showSubtitlesDialog(video, non_playback=False):
 
 
 def showQualityDialog(video, non_playback=False, selected_idx=None):
-    options = [(15 - i, T(l)) for (i, l) in enumerate((32017, 32002, 32016, 32003, 32004, 32005, 32015, 32006,
-                                                       32007, 32008, 32009, 32010, 32011))]
+    options = []
+    video_bitrate = video.mediaChoice.media.bitrate.asInt()
+
+    if video.settings.getPreference('clamp_video_bitrates', True):
+        bitrates = list(reversed(video.settings.getGlobal("transcodeVideoBitrates")))[1:]
+        for (i, l) in enumerate((32017, 32002, 32016, 32003, 32004, 32005, 32015, 32006, 32007, 32008, 32009, 32010,
+                                 32011)):
+            br_in_list = int(bitrates[i])
+            if br_in_list > video_bitrate:
+                if selected_idx is not None:
+                    selected_idx -= 1
+                continue
+
+            options.append((15 - i, T(l)))
+    else:
+        options = [(15 - i, T(l)) for (i, l) in enumerate((32017, 32002, 32016, 32003, 32004, 32005, 32015, 32006,
+                                                           32007, 32008, 32009, 32010, 32011))]
+
 
     options.insert(0, (16, u'{0} {1} ({2})'.format(
-                plexnet.util.bitrateToString(video.mediaChoice.media.bitrate.asInt() * 1000),
+                plexnet.util.bitrateToString(video_bitrate * 1000),
                 video.mediaChoice.media.getVideoResolutionString(),
                 T(32001, 'Original')
             )))

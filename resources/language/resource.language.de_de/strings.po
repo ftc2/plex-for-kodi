@@ -2991,3 +2991,11 @@ msgstr "Beenden, herunterladen und installieren"
 msgctxt "#33684"
 msgid "Later"
 msgstr "Später"
+
+msgctxt "#33685"
+msgid "Clamp video bitrate"
+msgstr "Video-Bitrate beschränken"
+
+msgctxt "#33686"
+msgid "Only show transcode bitrate targets lower than the current video's bitrate."
+msgstr "Nur Transcode-Bitrates anzeigen, die kleiner als die Bitrate des aktuellen Videos sind."

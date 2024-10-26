@@ -2412,3 +2412,11 @@ msgstr ""
 msgctxt "#33684"
 msgid "Later"
 msgstr ""
+
+msgctxt "#33685"
+msgid "Clamp video bitrate"
+msgstr ""
+
+msgctxt "#33686"
+msgid "Only show transcode bitrate targets lower than the current video's bitrate."
+msgstr ""

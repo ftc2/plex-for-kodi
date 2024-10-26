@@ -464,6 +464,10 @@ class Settings(object):
                 ).description(T(33661, "If you don't want your client to handle HDR (or HDR-fallback), "
                                        "enable this to force transcoding. Doesn't apply to DV Profile 5.")
                 ),
+                BoolSetting(
+                    'clamp_video_bitrates', T(33685, 'Clamp video bitrate'), True
+                ).description(T(33686, "Only show bitrate targets lower than the current video's bitrate.")
+                ),
                 MultiOptionsSetting(
                     'allowed_codecs', T(33059, ''),
                     ["allow_hevc", "allow_vc1"],
