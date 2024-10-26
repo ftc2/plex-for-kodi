@@ -22,35 +22,35 @@ msgid "Original"
 msgstr ""
 
 msgctxt "#32002"
-msgid "20 Mbps 1080p"
+msgid "20 Mbps"
 msgstr ""
 
 msgctxt "#32003"
-msgid "12 Mbps 1080p"
+msgid "12 Mbps"
 msgstr ""
 
 msgctxt "#32004"
-msgid "10 Mbps 1080p"
+msgid "10 Mbps"
 msgstr ""
 
 msgctxt "#32005"
-msgid "8 Mbps 1080p"
+msgid "8 Mbps"
 msgstr ""
 
 msgctxt "#32006"
-msgid "4 Mbps 720p"
+msgid "4 Mbps"
 msgstr ""
 
 msgctxt "#32007"
-msgid "3 Mbps 720p"
+msgid "3 Mbps"
 msgstr ""
 
 msgctxt "#32008"
-msgid "2 Mbps 720p"
+msgid "2 Mbps"
 msgstr ""
 
 msgctxt "#32009"
-msgid "1.5 Mbps 480p"
+msgid "1.5 Mbps"
 msgstr ""
 
 msgctxt "#32010"

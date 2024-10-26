@@ -166,14 +166,14 @@ class AppInterface(object):
 
         self._globals['qualities'] = [
             simpleobjects.AttributeDict({'title': "Original", 'index': 13, 'maxBitrate': 1000000}),
-            simpleobjects.AttributeDict({'title': "20 Mbps " + maxResolution, 'index': 12, 'maxBitrate': 20000}),
-            simpleobjects.AttributeDict({'title': "12 Mbps " + maxResolution, 'index': 11, 'maxBitrate': 12000}),
-            simpleobjects.AttributeDict({'title': "10 Mbps " + maxResolution, 'index': 10, 'maxBitrate': 10000}),
-            simpleobjects.AttributeDict({'title': "8 Mbps " + maxResolution, 'index': 9, 'maxBitrate': 8000}),
-            simpleobjects.AttributeDict({'title': "4 Mbps 720p", 'index': 8, 'maxBitrate': 4000, 'maxHeight': 720}),
-            simpleobjects.AttributeDict({'title': "3 Mbps 720p", 'index': 7, 'maxBitrate': 3000, 'maxHeight': 720}),
-            simpleobjects.AttributeDict({'title': "2 Mbps 720p", 'index': 6, 'maxBitrate': 2000, 'maxHeight': 720}),
-            simpleobjects.AttributeDict({'title': "1.5 Mbps 480p", 'index': 5, 'maxBitrate': 1500, 'maxHeight': 480}),
+            simpleobjects.AttributeDict({'title': "20 Mbps", 'index': 12, 'maxBitrate': 20000}),
+            simpleobjects.AttributeDict({'title': "12 Mbps", 'index': 11, 'maxBitrate': 12000}),
+            simpleobjects.AttributeDict({'title': "10 Mbps", 'index': 10, 'maxBitrate': 10000}),
+            simpleobjects.AttributeDict({'title': "8 Mbps", 'index': 9, 'maxBitrate': 8000}),
+            simpleobjects.AttributeDict({'title': "4 Mbps", 'index': 8, 'maxBitrate': 4000, 'maxHeight': 720}),
+            simpleobjects.AttributeDict({'title': "3 Mbps", 'index': 7, 'maxBitrate': 3000, 'maxHeight': 720}),
+            simpleobjects.AttributeDict({'title': "2 Mbps", 'index': 6, 'maxBitrate': 2000, 'maxHeight': 720}),
+            simpleobjects.AttributeDict({'title': "1.5 Mbps", 'index': 5, 'maxBitrate': 1500, 'maxHeight': 480}),
             simpleobjects.AttributeDict({'title': "720 Kbps", 'index': 4, 'maxBitrate': 720, 'maxHeight': 360}),
             simpleobjects.AttributeDict({'title': "320 Kbps", 'index': 3, 'maxBitrate': 320, 'maxHeight': 360}),
             maxQuality
