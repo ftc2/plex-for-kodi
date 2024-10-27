@@ -262,8 +262,7 @@ class BaseWindow(XMLBase, xbmcgui.WindowXML, BaseFunctions):
 
     def updateBackgroundFrom(self, ds):
         if util.addonSettings.dynamicBackgrounds:
-            w, h = util.scaleResolution(self.width, self.height, by=util.addonSettings.backgroundResolutionScalePerc)
-            return self.windowSetBackground(util.backgroundFromArt(ds.art, width=w, height=h))
+            return self.windowSetBackground(util.backgroundFromArt(ds.art, width=self.width, height=self.height))
 
     def windowSetBackground(self, value):
         if not util.addonSettings.dbgCrossfade:

@@ -901,8 +901,10 @@ def getProgressImage(obj, perc=None, view_offset=None):
 def backgroundFromArt(art, width=1920, height=1080, background=colors.noAlpha.Background):
     if not art:
         return
+
+    w, h = scaleResolution(width, height, by=addonSettings.backgroundResolutionScalePerc)
     return art.asTranscodedImageURL(
-        width, height,
+        w, h,
         blur=addonSettings.backgroundArtBlurAmount2,
         opacity=addonSettings.backgroundArtOpacityAmount2,
         background=background
