@@ -766,7 +766,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                     return True
 
     def tick(self):
-        if self.service_responder():
+        if self.is_active and self.service_responder():
             return
 
         if self.is_active and self._updateSourceChanged:
