@@ -351,6 +351,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
             self.episodeListControl.reset()
             self.relatedListControl.reset()
             self.reset(episode=redirect.episode if redirect.select_episode else None, season=redirect.season)
+            self.hadUserInteraction = True
             self._setup()
             self.postSetup()
             return
@@ -1457,7 +1458,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
                         tries = 0
                         PBID = self.getPlayButtonID(mli)
                         while not xbmc.getCondVisibility('Control.IsVisible({})'.format(PBID)) \
-                                and not util.MONITOR.abortRequested() and tries < 5:
+                                and not util.MONITOR.abortRequested() and tries < 15:
                             util.MONITOR.waitForAbort(0.1)
                             tries += 1
                         if xbmc.getCondVisibility('Control.IsVisible({})'.format(PBID)) and self.getFocusId() != PBID:
