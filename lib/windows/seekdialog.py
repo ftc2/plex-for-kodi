@@ -1697,6 +1697,7 @@ class SeekDialog(kodigui.BaseDialog):
     def updateCurrent(self, update_position_control=True, atOffset=None):
         ratio = self.trueOffset() / float(self.duration)
 
+        w = None
         if update_position_control:
             w = int(ratio * self.SEEK_IMAGE_WIDTH)
             self.positionControl.setWidth(w)
@@ -1704,7 +1705,8 @@ class SeekDialog(kodigui.BaseDialog):
         # update cache/buffer bar
         if util.addonSettings.playerShowBuffer and self.isDirectPlay and util.KODI_VERSION_MAJOR > 18:
             cache_w = int(xbmc.getInfoLabel("Player.ProgressCache")) * self.SEEK_IMAGE_WIDTH // 100
-            self.cacheControl.setWidth(cache_w)
+            w = w or self.positionControl.getWidth()
+            self.cacheControl.setWidth(max(cache_w, w+5))
 
         if self.isTranscoded:
             to = atOffset if atOffset is not None else self.trueOffset()
