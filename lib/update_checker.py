@@ -116,7 +116,7 @@ def update_loop():
 
                         dir_loc = updater.unpack()
 
-                        has_major_changes = updater.get_major_changes()
+                        major_changes = updater.get_major_changes()
 
                         pd.update(50, message="Installing")
 
@@ -124,28 +124,28 @@ def update_loop():
                             dest_loc = updater.install(dir_loc)
                             if dest_loc:
                                 log("Version {} installed. Major changes: {}".format(update_version,
-                                                                                     has_major_changes))
+                                                                                     major_changes))
                                 pd.update(75, message="Cleaning up")
                                 updater.cleanup()
                                 pd.update(100, message="Preparing to start")
                                 monitor.waitForAbort(1.0)
 
                                 do_start = True
-                                if has_major_changes:
-                                    log("Major changes detected, prompting the user: {}".format(has_major_changes))
+                                if "service" in major_changes or "language" in major_changes:
+                                    log("Major changes detected, prompting the user: {}".format(major_changes))
 
                                     kw = {}
                                     if KODI_VERSION_MAJOR >= 20:
                                         kw = {'defaultbutton': xbmcgui.DLG_YESNO_YES_BTN}
                                     do_start = xbmcgui.Dialog().yesno(
                                         T(33681, 'Service updated')
-                                        if has_major_changes == "service" else
+                                        if "service" in major_changes else
                                         T(33687, 'Translation updated'),
                                         (T(33682, 'The update {} has had changes to the updater itself. In '
                                                   'order for the updated updater service to work, a Kodi restart is '
                                                   'necessary. The addon will work normally, though. Do you still '
                                                   'want to run the addon?')
-                                         if has_major_changes == "service" else
+                                         if "service" in major_changes else
                                          T(33688, 'The currently in-use translation has been updated. In '
                                                   'order to load the new translation, a Kodi restart is necessary. '
                                                   'The addon will still run properly, but you might see badly or '
@@ -164,6 +164,9 @@ def update_loop():
 
                                 if do_start:
                                     xbmc.executebuiltin('RunScript(script.plexmod,0,0,1)')
+
+                                if "updater" in major_changes:
+                                    return True
 
                 except UpdateException as e:
                     log(e, xbmc.LOGWARNING)

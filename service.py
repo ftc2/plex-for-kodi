@@ -1,28 +1,45 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-# noinspection PyUnresolvedReferences
-from lib.kodi_util import xbmc, ADDON, getGlobalProperty, setGlobalProperty, FROM_KODI_REPOSITORY
-from lib.update_checker import update_loop
-from lib.logging import service_log
+try:
+    from importlib import reload
+except ImportError:
+    try:
+        from imp import reload
+    except ImportError:
+        pass
+        # python 2.7 has "reload" natively
+
+import lib.update_checker as uc
+import lib.kodi_util as ku
+import lib.logging as lo
 
 
 def main():
-    if getGlobalProperty('service.started'):
+    if ku.getGlobalProperty('service.started'):
         # Prevent add-on updates from starting a new version of the addon
         return
 
-    service_log('Started', realm="Service")
-    setGlobalProperty('service.started', '1', wait=True)
+    lo.service_log('Started', realm="Service")
+    ku.setGlobalProperty('service.started', '1', wait=True)
 
-    if ADDON.getSetting('kiosk.mode') == 'true':
-        xbmc.log('script.plexmod: Starting from service (Kiosk Mode)', xbmc.LOGINFO)
-        delay = ADDON.getSetting('kiosk.delay') or "0"
-        xbmc.executebuiltin('RunScript(script.plexmod,1{})'.format(",{}".format(delay) if delay != "0" else ""))
+    if ku.ADDON.getSetting('kiosk.mode') == 'true':
+        ku.xbmc.log('script.plexmod: Starting from service (Kiosk Mode)', ku.xbmc.LOGINFO)
+        delay = ku.ADDON.getSetting('kiosk.delay') or "0"
+        ku.xbmc.executebuiltin('RunScript(script.plexmod,1{})'.format(",{}".format(delay) if delay != "0" else ""))
 
-    if not FROM_KODI_REPOSITORY and ADDON.getSetting('auto_update_check') != "false":
-        update_loop()
+    if not ku.FROM_KODI_REPOSITORY and ku.ADDON.getSetting('auto_update_check') != "false":
+        while not ku.xbmc.Monitor().abortRequested():
+            # enter the update loop. if it exits positively, it wants to be reloaded
+            if uc.update_loop():
+                lo.service_log("Reloading update_checker due to code changes", realm="Service")
+                reload(uc)
+                reload(ku)
+                reload(lo)
+            else:
+                # update loop didn't exit cleanly, break
+                break
 
 if __name__ == '__main__':
     main()
-    service_log("Exited", realm="Service")
+    lo.service_log("Exited", realm="Service")

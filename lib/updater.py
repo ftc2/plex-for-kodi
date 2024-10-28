@@ -72,15 +72,17 @@ class UpdaterSkipException(Exception):
 def get_digest(file_path):
     h = hashlib.md5()
 
-    with open(file_path, 'rb') as file:
-        while True:
-            # Reading is buffered, so we can read smaller chunks.
-            chunk = file.read(h.block_size)
-            if not chunk:
-                break
-            h.update(chunk)
-
-    return h.hexdigest()
+    try:
+        with open(file_path, 'rb') as file:
+            while True:
+                # Reading is buffered, so we can read smaller chunks.
+                chunk = file.read(h.block_size)
+                if not chunk:
+                    break
+                h.update(chunk)
+        return h.hexdigest()
+    except:
+        return ""
 
 
 @register_updater
@@ -193,17 +195,27 @@ class Updater(object):
             raise UpdateUnpackFailed(tb)
 
     def get_major_changes(self):
+        changes = []
+
         # check service.py
         if get_digest(os.path.join(translatePath(ADDON.getAddonInfo('path')), "service.py")) != \
                 get_digest(os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", "service.py")):
-            return "service"
+            changes.append("service")
+
+        # check update_checker.py and dependencies
+        for a in ("update_checker.py", "updater.py", "kodi_util.py", "logging.py"):
+            if get_digest(os.path.join(translatePath(ADDON.getAddonInfo('path')), "lib", a)) != \
+                    get_digest(os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", "lib", a)):
+                changes.append("updater")
+                break
 
         # check current language file
         ptl = ("resources", "language", LANGUAGE_RESOURCE, "strings.po")
         ptr1 = os.path.join(translatePath(ADDON.getAddonInfo('path')), *ptl)
         ptr2 = os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", *ptl)
         if os.path.exists(ptr1) and os.path.exists(ptr2) and get_digest(ptr1) != get_digest(ptr2):
-            return "language"
+            changes.append("language")
+        return changes
 
     def install(self, path):
         dest = os.path.join(translatePath('special://home/addons/'), "script.plexmod")
