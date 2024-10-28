@@ -757,12 +757,13 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
 
             if resp == "commence":
                 # wait for it to be consumed
-                util.waitForConsumption('update_response', timeout=20)
-
-                self._shuttingDown = True
-                #self.closeOption = "update"
-                self.doClose()
-                return True
+                try:
+                    util.waitForConsumption('update_response', timeout=200)
+                finally:
+                    self._shuttingDown = True
+                    #self.closeOption = "update"
+                    self.doClose()
+                    return True
 
     def tick(self):
         if self.service_responder():
