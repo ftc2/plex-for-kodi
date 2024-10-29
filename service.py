@@ -36,6 +36,9 @@ def main():
                 reload(uc)
                 reload(ku)
                 reload(lo)
+
+                # reload ADDON
+                ku.ADDON = ku.xbmcaddon.Addon()
             else:
                 # update loop didn't exit cleanly, break
                 break

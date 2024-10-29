@@ -167,7 +167,7 @@ def update_loop():
                                 if do_start:
                                     xbmc.executebuiltin('RunScript(script.plexmod,0,0,1)')
 
-                                if "updater" in major_changes:
+                                if "updater" in major_changes or "service" in major_changes:
                                     return True
 
                 except UpdateException as e:
