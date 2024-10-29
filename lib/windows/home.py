@@ -746,7 +746,8 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                     new_version=util.getGlobalProperty('update_available'),
                 ),
                 T(33683, 'Exit, download and install'),
-                T(33684, 'Later') if not is_downgrade else T(32329, 'No')
+                T(33684, 'Later') if not is_downgrade else T(32329, 'No'),
+                delay_buttons=1.8
             )
             if button == 0:
                 resp = "commence"
