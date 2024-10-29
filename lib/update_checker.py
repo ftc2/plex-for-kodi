@@ -116,6 +116,8 @@ def update_loop():
 
                         dir_loc = updater.unpack()
 
+                        pd.update(35, message="Calculating changes")
+
                         major_changes = updater.get_major_changes()
 
                         pd.update(50, message="Installing")
