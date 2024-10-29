@@ -126,6 +126,11 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="use_alternate_seek" type="boolean" label="33667" help="33668">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="coreelec_resume_seek_wait" type="integer" label="33649" help="33650">
                     <level>0</level>
                     <default>500</default>
