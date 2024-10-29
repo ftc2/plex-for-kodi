@@ -370,8 +370,9 @@
                 <shadowcolor>black</shadowcolor>
                 <visible>Player.HasVideo + !String.IsEmpty(Window.Property(ppi.Container))</visible>
             </control>
-            <control type="label">
+            <control type="textbox">
                 <width>893</width>
+                <autoscroll delay="1000" time="1000" repeat="2000"></autoscroll>
                 <height>{{ vscale(50) }}</height>
                 <aligny>bottom</aligny>
                 <label>[COLOR FFE5A00D]Video:[/COLOR] $INFO[Window.Property(ppi.Video)]</label>
@@ -379,8 +380,9 @@
                 <shadowcolor>black</shadowcolor>
                 <visible>Player.HasVideo + !String.IsEmpty(Window.Property(ppi.Video))</visible>
             </control>
-            <control type="label">
+            <control type="textbox">
                 <width>893</width>
+                <autoscroll delay="1000" time="1000" repeat="2000"></autoscroll>
                 <height>{{ vscale(50) }}</height>
                 <aligny>bottom</aligny>
                 <label>$INFO[Window.Property(ppi.Audio),[COLOR FFE5A00D]Audio:[/COLOR] ]$INFO[Window.Property(ppi.Subtitles),   [COLOR FFE5A00D]Subtitle:[/COLOR] ]</label>
@@ -388,8 +390,9 @@
                 <shadowcolor>black</shadowcolor>
                 <visible>Player.HasVideo + [!String.IsEmpty(Window.Property(ppi.Audio)) | !String.IsEmpty(Window.Property(ppi.Subtitles))]</visible>
             </control>
-            <control type="label">
+            <control type="textbox">
                 <width>893</width>
+                <autoscroll delay="1000" time="1000" repeat="2000"></autoscroll>
                 <height>{{ vscale(50) }}</height>
                 <aligny>bottom</aligny>
                 <label>[COLOR FFE5A00D]Server:[/COLOR] $INFO[Window.Property(ppi.User)]</label>
