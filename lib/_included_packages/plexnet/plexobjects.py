@@ -15,7 +15,8 @@ SEARCHTYPES = {
     'episode': 4,
     'artist': 8,
     'album': 9,
-    'track': 10
+    'track': 10,
+    'collection': 18
 }
 
 LIBRARY_TYPES = {}

@@ -13,6 +13,7 @@ import six.moves.urllib.request
 from kodi_six import xbmc
 from kodi_six import xbmcgui
 from plexnet import playqueue
+from plexnet import plexobjects
 from six.moves import range
 
 from lib import backgroundthread
@@ -176,6 +177,20 @@ def setItemType(type_=None):
     ITEM_TYPE = type_
     util.setGlobalProperty('item.type', str(ITEM_TYPE))
 
+def getQueryItemType(section):
+    base_type = ITEM_TYPE
+
+    if not base_type:
+        base_type = section.TYPE
+
+    type_ = plexobjects.SEARCHTYPES.get(base_type)
+
+    # combine collections into types, otherwise jumpList/firstCharacter returns different results with
+    # includeCollections=1
+    if type_ is not None and type_ != 18:
+        type_ = "{},{}".format(type_, 18)
+    return type_
+
 class CreateDefaultItemsTask(backgroundthread.Task):
     def setup(self, startPos, count, totalSize, fallback, callback, key=None):
         self.startPos = startPos
@@ -229,15 +244,7 @@ class ChunkRequestTask(backgroundthread.Task):
             return
 
         try:
-            type_ = None
-            if ITEM_TYPE == 'episode':
-                type_ = 4
-            elif ITEM_TYPE == 'album':
-                type_ = 9
-            elif ITEM_TYPE == 'collection':
-                type_ = 18
-            elif ITEM_TYPE == 'track':
-                type_ = 10
+            type_ = getQueryItemType(self.section)
 
             if ITEM_TYPE == 'folder':
                 items = self.section.folder(self.start, self.size, self.subDir)
@@ -1185,6 +1192,10 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
     def getDefChunkSize(self, size):
         return self.DEFAULT_ITEMS_CHUNK_SIZE if size < 1000 else self.DEFAULT_ITEMS_CHUNK_SIZE_BIG
 
+    @property
+    def thumb_fallback(self):
+        return 'script.plex/thumb_fallbacks/{0}.png'.format(TYPE_KEYS.get(self.section.type, TYPE_KEYS['movie'])['fallback'])
+
     @busy.dialog()
     def fillShows(self):
         self.setBoolProperty('no.content', False)
@@ -1198,18 +1209,9 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
         self.alreadyFetchedChunkList = set()
         self.finalChunkPosition = 0
 
-        type_ = None
-        if ITEM_TYPE == 'episode':
-            type_ = 4
-        elif ITEM_TYPE == 'album':
-            type_ = 9
-        elif ITEM_TYPE == 'collection':
-            type_ = 18
-        elif ITEM_TYPE == 'track':
-            type_ = 10
+        type_ = getQueryItemType(self.section)
 
         tasks = []
-        fallback = 'script.plex/thumb_fallbacks/{0}.png'.format(TYPE_KEYS.get(self.section.type, TYPE_KEYS['movie'])['fallback'])
 
         if self.sort != 'titleSort' or ITEM_TYPE in ('folder', 'episode') or self.subDir or self.section.TYPE == "collection":
             if ITEM_TYPE == 'folder':
@@ -1229,7 +1231,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                     self.setBoolProperty('no.content', True)
             else:
                 for startPosition in range(0, totalSize, self.getDefChunkSize(totalSize)):
-                    tasks.append(CreateDefaultItemsTask().setup(startPosition, self.getDefChunkSize(totalSize), totalSize, fallback, self._defaultItemsCallback))
+                    tasks.append(CreateDefaultItemsTask().setup(startPosition, self.getDefChunkSize(totalSize), totalSize, self.thumb_fallback, self._defaultItemsCallback))
         else:
             jumpList = self.section.jumpList(filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, type_=type_)
 
@@ -1257,7 +1259,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                 jitems.append(mli)
                 totalSize += ji_size
 
-                tasks.append(CreateDefaultItemsTask().setup(idx, ji.size.asInt(), totalSize, fallback, self._defaultItemsCallback, key=ji.key))
+                tasks.append(CreateDefaultItemsTask().setup(idx, ji.size.asInt(), totalSize, self.thumb_fallback, self._defaultItemsCallback, key=ji.key))
                 idx += ji_size
 
             util.setGlobalProperty('key', jumpList[0].key)
@@ -1282,12 +1284,9 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
         tasks = []
         for startChunkPosition in range(0, totalSize, self.CHUNK_SIZE):
-            # fixme: this is a workaround so we don't error out when firstCharacter and /all item count differ
-            # this might hide items
-            chunkEnd = totalSize if totalSize < self.CHUNK_SIZE else self.CHUNK_SIZE
             tasks.append(
                 ChunkRequestTask().setup(
-                    self.section, startChunkPosition, chunkEnd, self._chunkCallback, filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, subDir=self.subDir
+                    self.section, startChunkPosition, self.CHUNK_SIZE, self._chunkCallback, filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, subDir=self.subDir
                 )
             )
 
