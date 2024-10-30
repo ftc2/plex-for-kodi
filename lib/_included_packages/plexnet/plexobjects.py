@@ -59,7 +59,7 @@ class PlexValue(six.text_type):
         return self.asInt() < other
 
     def asBool(self):
-        return self == '1'
+        return self == '1' or self == 'true'
 
     def asInt(self, default=0):
         return int(self or default)
