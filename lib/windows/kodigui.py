@@ -110,7 +110,7 @@ class XMLBase(object):
             self.getControl(666)
         except RuntimeError as e:
             if e.args and "Non-Existent Control" in e.args[0]:
-                if count < 4:
+                if count < 8:
                     # retry
                     xbmc.sleep(250)
                     return self.onInit(count=count+1)
