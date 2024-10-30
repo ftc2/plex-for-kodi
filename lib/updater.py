@@ -198,8 +198,9 @@ class Updater(object):
         changes = []
 
         # check service.py
-        if get_digest(os.path.join(translatePath(ADDON.getAddonInfo('path')), "service.py")) != \
-                get_digest(os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", "service.py")):
+        if get_digest(os.path.join(translatePath(ADDON.getAddonInfo('path')), "lib", "service_runner.py")) != \
+                get_digest(os.path.join(os.path.splitext(self.archive_path)[0], "script.plexmod", "lib",
+                                        "service_runner.py")):
             changes.append("service")
 
         # check update_checker.py and dependencies

@@ -4,11 +4,34 @@ import datetime
 import json
 import traceback
 
-from lib.kodi_util import (xbmc, xbmcgui, ADDON, IPCTimeoutException, waitForGPEmpty, ICON_PATH,
+import lib.kodi_util
+# noinspection PyUnresolvedReferences
+from lib.kodi_util import (xbmc, xbmcgui, xbmcaddon, IPCTimeoutException, waitForGPEmpty, ICON_PATH,
                            setGlobalProperty, getGlobalProperty, KODI_VERSION_MAJOR)
 from lib.settings_util import getSetting, setSetting
 from lib.i18n import T
 from lib.logging import service_log as log
+
+
+def should_check():
+    return not any([
+        xbmc.Player().isPlaying(),
+        getGlobalProperty('running') != '1',
+        getGlobalProperty('started') != '1',
+        getGlobalProperty('is_active') != '1',
+        getGlobalProperty('waiting_for_start')
+    ])
+
+
+def disable_enable_addon():
+    log("Toggling")
+    try:
+        xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled',
+                                 'params': {'addonid': 'script.plexmod', 'enabled': False}}))
+        xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled',
+                                 'params': {'addonid': 'script.plexmod', 'enabled': True}}))
+    except:
+        raise
 
 
 def update_loop():
@@ -19,28 +42,10 @@ def update_loop():
     last_update_check = getSetting('last_update_check', datetime.datetime.fromtimestamp(0))
     check_interval = datetime.timedelta(hours=getSetting('update_interval_hours', 4))
     check_immediate = getSetting('update_check_startup', True)
+    branch = getSetting('update_branch', "develop_kodi21")
     mode = getSetting('update_source', 'repository')
 
-    updater = get_updater(mode)(branch='develop_kodi21' if KODI_VERSION_MAJOR > 18 else 'addon_kodi18')
-
-    def should_check():
-        return not any([
-            xbmc.Player().isPlaying(),
-            getGlobalProperty('running') != '1',
-            getGlobalProperty('started') != '1',
-            getGlobalProperty('is_active') != '1',
-            getGlobalProperty('waiting_for_start')
-        ])
-
-    def disable_enable_addon():
-        log("Toggling")
-        try:
-            xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled',
-                                     'params': {'addonid': 'script.plexmod', 'enabled': False}}))
-            xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled',
-                                     'params': {'addonid': 'script.plexmod', 'enabled': True}}))
-        except:
-            raise
+    updater = get_updater(mode)(branch=branch if KODI_VERSION_MAJOR > 18 else 'addon_kodi18')
 
     while not getGlobalProperty('running') and not monitor.abortRequested():
         if monitor.waitForAbort(1):
@@ -55,14 +60,14 @@ def update_loop():
         mode_change = getGlobalProperty('update_source_changed', consume=True)
         allow_downgrade = False
         if mode_change and mode_change != mode:
-            updater = get_updater(mode_change)(branch='develop_kodi21' if KODI_VERSION_MAJOR > 18 else 'addon_kodi18')
+            updater = get_updater(mode_change)(branch=branch if KODI_VERSION_MAJOR > 18 else 'addon_kodi18')
             mode = mode_change
             allow_downgrade = True
             check_immediate = True
 
         if (last_update_check + check_interval <= now or check_immediate) and not monitor.sleeping:
             if should_check():
-                addon_version = ADDON.getAddonInfo('version')
+                addon_version = lib.kodi_util.ADDON.getAddonInfo('version')
                 try:
                     pd = None
                     if check_immediate:
@@ -163,6 +168,9 @@ def update_loop():
                                 pd.close()
                                 del pd
                                 #disable_enable_addon()
+
+                                # reload addon info
+                                lib.kodi_util.ADDON = xbmcaddon.Addon()
 
                                 if do_start:
                                     xbmc.executebuiltin('RunScript(script.plexmod,0,0,1)')
