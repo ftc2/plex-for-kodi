@@ -177,17 +177,20 @@ def setItemType(type_=None):
     ITEM_TYPE = type_
     util.setGlobalProperty('item.type', str(ITEM_TYPE))
 
-def getQueryItemType(section):
+def getQueryItemType(section, fallback_to_section_type=False, force_include_collections=False):
     base_type = ITEM_TYPE
 
-    if not base_type:
+    if fallback_to_section_type and not base_type:
         base_type = section.TYPE
+
+    if not base_type:
+        return
 
     type_ = plexobjects.SEARCHTYPES.get(base_type)
 
     # combine collections into types, otherwise jumpList/firstCharacter returns different results with
     # includeCollections=1
-    if type_ is not None and type_ != 18:
+    if force_include_collections and type_ is not None and type_ != 18:
         type_ = "{},{}".format(type_, 18)
     return type_
 
@@ -1233,7 +1236,16 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
                 for startPosition in range(0, totalSize, self.getDefChunkSize(totalSize)):
                     tasks.append(CreateDefaultItemsTask().setup(startPosition, self.getDefChunkSize(totalSize), totalSize, self.thumb_fallback, self._defaultItemsCallback))
         else:
-            jumpList = self.section.jumpList(filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, type_=type_)
+            # find library collection mode setting, as we need to force-feed the collection type to the jumpList,
+            # if collection_mode is 2, otherwise the returned item count differs from /all with the same parameters
+            collection_mode = self.section.settings.get("collectionMode",
+                                                       {"value": plexobjects.PlexValue(2)})["value"].asInt()
+
+            jl_type = type_
+            if collection_mode == 2:
+                jl_type = getQueryItemType(self.section, fallback_to_section_type=True, force_include_collections=True)
+
+            jumpList = self.section.jumpList(filter_=self.getFilterOpts(), sort=self.getSortOpts(), unwatched=self.filterUnwatched, type_=jl_type)
 
             if not jumpList:
                 self.showPanelControl.reset()
@@ -1261,6 +1273,8 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
 
                 tasks.append(CreateDefaultItemsTask().setup(idx, ji.size.asInt(), totalSize, self.thumb_fallback, self._defaultItemsCallback, key=ji.key))
                 idx += ji_size
+
+            util.DEBUG_LOG('JumpList item size: {}', totalSize)
 
             util.setGlobalProperty('key', jumpList[0].key)
 

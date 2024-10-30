@@ -95,6 +95,7 @@ class LibrarySection(plexobjects.PlexObject):
     def __init__(self, data, initpath=None, server=None, container=None):
         self.locations = []
         self._isMapped = None
+        self._settings = None
         super(LibrarySection, self).__init__(data, initpath=initpath, server=server, container=container)
 
     def __repr__(self):
@@ -177,6 +178,23 @@ class LibrarySection(plexobjects.PlexObject):
             path = '/library/sections/{0}/all'.format(self.key)
         
         return self.items(path, start, size, filter_, sort, unwatched, type_, False)
+
+    @property
+    def settings(self):
+        if self._settings is None:
+            if self.key.startswith('/'):
+                path = '{0}/prefs'.format(self.key)
+            else:
+                path = '/library/sections/{0}/prefs'.format(self.key)
+
+            try:
+                self._settings = {setting.id: {"default": setting.default, "value": setting.value}
+                                  for setting in plexobjects.listItems(self.server, path, bytag=True)}
+            except:
+                util.LOG("Couldn't get settings for {0}".format(self.key))
+                self._settings = {}
+
+        return self._settings
     
     def folder(self, start=None, size=None, subDir=False):
         if self.key.startswith('/'):
@@ -487,6 +505,12 @@ class Generic(plexobjects.PlexObject):
 #@plexobjects.registerLibType
 #class Collection(Generic):
 #    TYPE = 'collection'
+
+
+@plexobjects.registerLibType
+class Setting(plexobjects.PlexObject):
+    TYPE = 'Setting'
+
 
 @plexobjects.registerLibType
 class Playlist(playlist.BasePlaylist, signalsmixin.SignalsMixin):
