@@ -1407,12 +1407,19 @@ class SeekDialog(kodigui.BaseDialog):
             self.disableSubtitles()
             return False
         else:
-            self.cycleSubtitles()
+            self.enableSubtitles()
             return True
 
     def disableSubtitles(self):
-        self.player.video.disableSubtitles()
+        self.player.video.disableSubtitles(sync_to_server=False)
         self.setSubtitles()
+        if self.isTranscoded:
+            self.doSeek(self.trueOffset(), settings_changed=True)
+
+    def enableSubtitles(self):
+        stream = self.player.video.enableSubtitles(sync_to_server=False)
+        self.setSubtitles()
+        util.showNotification(str(stream), time_ms=1500, header=util.T(32396, "Subtitles"))
         if self.isTranscoded:
             self.doSeek(self.trueOffset(), settings_changed=True)
 
@@ -1420,7 +1427,7 @@ class SeekDialog(kodigui.BaseDialog):
         """
         Selects the first subtitle or the next one
         """
-        stream = self.player.video.cycleSubtitles(forward=forward)
+        stream = self.player.video.cycleSubtitles(forward=forward, sync_to_server=False)
         self.setSubtitles(honor_forced_subtitles_override=False)
         util.showNotification(str(stream), time_ms=1500, header=util.T(32396, "Subtitles"))
         if self.isTranscoded:

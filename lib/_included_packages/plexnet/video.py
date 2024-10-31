@@ -66,6 +66,7 @@ class Video(media.MediaItem, AudioCodecMixin):
     manually_selected_sub_stream = False
     current_subtitle_is_embedded = False
     _current_subtitle_idx = None
+    _prev_subtitle_idx = None
     _noSpoilers = False
 
     def __init__(self, *args, **kwargs):
@@ -129,10 +130,11 @@ class Video(media.MediaItem, AudioCodecMixin):
                 return self.audioStreams[0]
         return None
 
-    def selectedSubtitleStream(self, forced_subtitles_override=False, fallback=False):
-        if self._current_subtitle_idx:
+    def selectedSubtitleStream(self, forced_subtitles_override=False, fallback=False, ref="_current_subtitle_idx"):
+        sidx = getattr(self, ref)
+        if sidx:
             try:
-                return self.subtitleStreams[self._current_subtitle_idx]
+                return self.subtitleStreams[sidx]
             except IndexError:
                 pass
 
@@ -176,9 +178,10 @@ class Video(media.MediaItem, AudioCodecMixin):
         self.mediaChoice = mediachoice.MediaChoice(media, partIndex=partIndex)
 
     @forceMediaChoice
-    def selectStream(self, stream, _async=True, from_session=False):
-        self.mediaChoice.part.setSelectedStream(stream.streamType.asInt(), stream.id, _async, from_session=from_session,
-                                                video=self)
+    def selectStream(self, stream, _async=True, from_session=False, sync_to_server=True):
+        if sync_to_server:
+            self.mediaChoice.part.setSelectedStream(stream.streamType.asInt(), stream.id, _async, from_session=from_session,
+                                                    video=self)
         # Update any affected streams
         if stream.streamType.asInt() == plexstream.PlexStream.TYPE_AUDIO:
             for audioStream in self.audioStreams:
@@ -198,7 +201,12 @@ class Video(media.MediaItem, AudioCodecMixin):
                     subtitleStream.setSelected(False)
 
     @forceMediaChoice
-    def cycleSubtitles(self, forward=True):
+    def cycleSubtitles(self, forward=True, sync_to_server=False):
+        """
+        Only used by SeekDialog Subtitle Quick Settings to toggle subs
+        @param sync_to_server: Don't persist changes to the PMS
+        @return: selected stream
+        """
         amount = len(self.subtitleStreams)
         if not amount:
             return False
@@ -220,12 +228,33 @@ class Video(media.MediaItem, AudioCodecMixin):
                     stream = self.subtitleStreams[-1]
 
         util.DEBUG_LOG("Selecting subtitle stream: {} (was: {})", stream, cur)
-        self.selectStream(stream)
+        self.selectStream(stream, sync_to_server=sync_to_server)
         return stream
 
     @forceMediaChoice
-    def disableSubtitles(self):
-        self.selectStream(plexstream.NONE_STREAM)
+    def disableSubtitles(self, sync_to_server=False):
+        """
+        Only used by SeekDialog Subtitle Quick Settings to toggle subs
+        @param sync_to_server: Don't persist changes to the PMS
+        @return:
+        """
+        # store previously selected subtitle on disable, to be able to re-enable it from seekdialog
+        self._prev_subtitle_idx = self._current_subtitle_idx
+        self.selectStream(plexstream.NONE_STREAM, sync_to_server=sync_to_server)
+
+    @forceMediaChoice
+    def enableSubtitles(self, sync_to_server=False):
+        """
+        Only used by SeekDialog Subtitle Quick Settings to toggle subs
+        @param sync_to_server: Don't persist changes to the PMS
+        @return: selected stream
+        """
+        stream = self.selectedSubtitleStream(ref="_prev_subtitle_idx")
+        if not stream:
+            # use fallback
+            stream = self.selectedSubtitleStream(fallback=True, ref="_subtitleStreams_orig")
+        self.selectStream(stream, sync_to_server=sync_to_server)
+        return stream
 
     @property
     def hasSubtitle(self):
