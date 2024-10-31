@@ -1383,12 +1383,16 @@ class SeekDialog(kodigui.BaseDialog):
             self.cycleSubtitles(forward=False)
             self.lastSubtitleNavAction = "backward"
         elif choice['key'] == 'enable':
+            if self.player.playState == self.player.STATE_PLAYING:
+                self.hideOSD()
             enabled = self.toggleSubtitles()
             self.lastSubtitleNavAction = "forward"
         elif choice['key'] == 'auto_sync':
             sss.should_auto_sync = not sss.should_auto_sync
             # self.player.video isn't the same as the mediachoice representation
             self.player.playerObject.choice.subtitleStream.should_auto_sync = sss.should_auto_sync
+            if self.player.playState == self.player.STATE_PLAYING:
+                self.hideOSD()
             if self.isDirectPlay:
                 self.setSubtitles(honor_forced_subtitles_override=False)
             else:
