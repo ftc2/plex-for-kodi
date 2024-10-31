@@ -311,7 +311,7 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
         try:
             duration = player.PLAYER.getTotalTime() * 1000
             self.duration = duration if duration > 0 else self.duration
-        except RuntimeError:  # Not playing
+        except (RuntimeError, AttributeError):  # Not playing
             pass
 
     def seekForward(self, offset):
