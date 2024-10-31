@@ -14,6 +14,14 @@ from . import opener
 from . import windowutils
 
 
+def require_duration(f):
+    def wrapper(self, *args, **kwargs):
+        if not self.duration:
+            self.setDuration()
+        return f(self, *args, **kwargs)
+    return wrapper
+
+
 class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
     xmlFile = 'script-plex-music_current_playlist.xml'
     path = util.ADDON.getAddonInfo('path')
@@ -55,6 +63,8 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
     def __init__(self, *args, **kwargs):
         kodigui.ControlledWindow.__init__(self, *args, **kwargs)
         self.selectedOffset = 0
+        self.duration = None
+        self.track = None
         self.setDuration()
         self.exitCommand = None
         self.musicPlayerWinID = kwargs.get('winID')
@@ -145,6 +155,8 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
     def onAudioStarted(self, *args, **kwargs):
         util.setGlobalProperty('ignore_spinner', '')
         self.ignoreStopCommands = False
+        self.selectedOffset = 0
+        self.duration = None
         self.setDuration()
 
     def onAudioChanged(self, *args, **kwargs):
@@ -309,11 +321,18 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
 
     def setDuration(self):
         try:
-            duration = player.PLAYER.getTotalTime() * 1000
+            #duration = None
+            #if self.track:
+            #    duration = self.track.duration.asInt()
+            #if not duration:
+            #    duration = player.PLAYER.getTotalTime() * 1000
+            #if not duration:
+            duration = player.PLAYER.getMusicInfoTag().getDuration() * 1000
             self.duration = duration if duration > 0 else self.duration
         except (RuntimeError, AttributeError):  # Not playing
             pass
 
+    @require_duration
     def seekForward(self, offset):
         self.selectedOffset += offset
         if self.selectedOffset > self.duration:
@@ -321,6 +340,7 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
 
         self.updateSelectedProgress()
 
+    @require_duration
     def seekBack(self, offset):
         self.selectedOffset -= offset
         if self.selectedOffset < 0:
@@ -328,6 +348,7 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
 
         self.updateSelectedProgress()
 
+    @require_duration
     def seekMouse(self, action):
         x = self.mouseXTrans(action.getAmount1())
         y = self.mouseYTrans(action.getAmount2())
@@ -340,6 +361,7 @@ class CurrentPlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
         self.selectedOffset = int((x - self.BAR_X) / float(self.SEEK_IMAGE_WIDTH) * self.duration)
         self.updateSelectedProgress()
 
+    @require_duration
     def updateSelectedProgress(self):
         if not self.duration:
             return

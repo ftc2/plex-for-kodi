@@ -665,8 +665,7 @@ class ArtistWindow(ShowWindow):
     def playButtonClicked(self, shuffle=False):
         pl = playlist.LocalPlaylist(self.mediaItem.all(), self.mediaItem.getServer(), self.mediaItem)
         pl.startShuffled = shuffle
-        w = musicplayer.MusicPlayerWindow.open(track=pl.current(), playlist=pl)
-        del w
+        self.processCommand(opener.handleOpen(musicplayer.MusicPlayerWindow, track=pl.current(), playlist=pl))
 
     def updateProperties(self):
         self.setProperty('summary', self.mediaItem.summary)
