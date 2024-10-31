@@ -2428,3 +2428,11 @@ msgstr ""
 msgctxt "#33688"
 msgid "The currently in-use translation has been updated. In order to load the new translation, a Kodi restart is necessary. The addon will still run properly, but you might see badly or untranslated strings. Do you still want to run the addon?"
 msgstr ""
+
+msgctxt "#33689"
+msgid "Service running"
+msgstr ""
+
+msgctxt "#33690"
+msgid "Last update check"
+msgstr ""

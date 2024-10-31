@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import json
 import sys
+import datetime
 
 import plexnet
 from kodi_six import xbmc
@@ -885,6 +886,12 @@ class Settings(object):
                 InfoSetting('addon_path', T(33616, 'Addon Path'), util.ADDON.getAddonInfo("path")),
                 InfoSetting('userdata_path', T(33617, 'Userdata/Profile Path'),
                             util.translatePath("special://profile")),
+                InfoSetting('service_status', T(33689, 'Service running'),
+                            "{} ({})".format(
+                                util.getGlobalProperty("service.started") and T(32328, "Yes") or T(32329, "No"),
+                                util.getGlobalProperty("service.version"))),
+                InfoSetting('i_last_update_check', T(33690, "Last update check"),
+                            util.getSetting('last_update_check', datetime.datetime.fromtimestamp(0)).isoformat()),
             )
         ),
     }

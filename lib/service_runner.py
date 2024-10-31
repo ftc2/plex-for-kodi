@@ -30,6 +30,7 @@ def main(restarting_service=False):
     if not ku.FROM_KODI_REPOSITORY and ku.ADDON.getSetting('auto_update_check') != "false":
         while not ku.xbmc.Monitor().abortRequested():
             # enter the update loop. if it exits positively, it wants to be reloaded
+            ku.setGlobalProperty('service.version', ku.ADDON.getAddonInfo('version'))
             if uc.update_loop():
                 lo.service_log("Reloading service due to code changes", realm="Service")
                 reload(uc)
@@ -44,4 +45,3 @@ def main(restarting_service=False):
                 # update loop didn't exit cleanly, break
                 break
     lo.service_log("Exited", realm="Service")
-
