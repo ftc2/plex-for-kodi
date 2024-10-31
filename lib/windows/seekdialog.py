@@ -1347,7 +1347,12 @@ class SeekDialog(kodigui.BaseDialog):
             if t:
                 year = t.getYear()
                 if year:
-                    item.setInfo("video", {"year": 0})
+                    if util.KODI_VERSION_MAJOR >= 20:
+                        vi = item.getVideoInfoTag()
+                        vi.setYear(0)
+                    else:
+                        item.setInfo("video", {"year": 0})
+                    util.DEBUG_LOG("Removing videoInfo year for subtitle search")
                     self.player.updateInfoTag(item)
                     changed_info_tag = year
 
@@ -1360,7 +1365,11 @@ class SeekDialog(kodigui.BaseDialog):
                 util.MONITOR.waitForAbort(0.1)
 
             if changed_info_tag:
-                item.setInfo("video", {"year": changed_info_tag})
+                if util.KODI_VERSION_MAJOR >= 20:
+                    vi = item.getVideoInfoTag()
+                    vi.setYear(changed_info_tag)
+                else:
+                    item.setInfo("video", {"year": changed_info_tag})
                 self.player.updateInfoTag(item)
 
         elif choice['key'] == 'delay':

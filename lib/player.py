@@ -942,9 +942,14 @@ class AudioPlayerHandler(BasePlayerHandler):
                 plist.add(url, li)
 
             if swap is not None:
-                plist[0].setInfo('music', {
-                    'playcount': swap + 1,
-                })
+                if util.KODI_VERSION_MAJOR >= 20:
+                    vi = plist[0].getMusicInfoTag()
+                    vi.setPlayCount(swap + 1)
+
+                else:
+                    plist[0].setInfo('music', {
+                        'playcount': swap + 1,
+                    })
 
             # Now swap the track to the correct position. This seems to be the only way to update the kodi playlist position to the current track's new position
             if swap is not None and swap != current:
@@ -1461,12 +1466,30 @@ class PlexPlayer(xbmc.Player, signalsmixin.SignalsMixin):
         util.DEBUG_LOG("Setting VideoInfo: {}".format(
             plexnetUtil.cleanObjTokens(info, flistkeys=[])
         ))
-        li.setInfo('video', info)
+
         li.setArt({
             'poster': self.video.defaultThumb.asTranscodedImageURL(347, 518),
             'fanart': self.video.defaultArt.asTranscodedImageURL(1920, 1080),
             'thumb': self.video.defaultThumb.asTranscodedImageURL(256, 256),
         })
+
+        if util.KODI_VERSION_MAJOR >= 20:
+            li.setInfo('video', {'size': info['size']})
+
+            vi = li.getVideoInfoTag()
+            vi.setMediaType(info['mediatype'])
+            vi.setTitle(info['title'])
+            vi.setOriginalTitle(info['originaltitle'])
+            vi.setTvShowTitle(info['tvshowtitle'])
+            vi.setYear(info['year'])
+            vi.setPlot(info['plot'])
+            vi.setPath(info['path'])
+            vi.setIMDBNumber(info['imdbnumber'])
+            if vtype == "episode":
+                vi.setEpisode(info['episode'])
+                vi.setSeason(info['season'])
+        else:
+            li.setInfo('video', info)
 
         self.trigger('starting.video')
         self.handler.queuingNext = False
@@ -1593,7 +1616,7 @@ class PlexPlayer(xbmc.Player, signalsmixin.SignalsMixin):
             track = track.reload()
         url = self.playerObject.build(track)['url']
         li = xbmcgui.ListItem(track.title, path=url)
-        li.setInfo('music', {
+        info = {
             'artist': six.text_type(track.originalTitle or track.grandparentTitle),
             'title': six.text_type(track.title),
             'album': six.text_type(track.parentTitle),
@@ -1604,7 +1627,8 @@ class PlexPlayer(xbmc.Player, signalsmixin.SignalsMixin):
             # fixme: this is not really necessary, as we don't go the plugin:// route anymore.
             #        changing the track identification style would mean a bigger rewrite, though, so let's keep it.
             'comment': 'PLEX-{0}:{1}'.format(track.ratingKey, data)
-        })
+        }
+
         art = fanart or track.defaultArt
         li.setArt({
             'fanart': art.asTranscodedImageURL(1920, 1080),
@@ -1613,6 +1637,20 @@ class PlexPlayer(xbmc.Player, signalsmixin.SignalsMixin):
         })
         if fanart:
             li.setArt({'fanart': fanart})
+
+        if util.KODI_VERSION_MAJOR >= 20:
+            ai = li.getMusicInfoTag()
+            ai.setArtist(info['artist'])
+            ai.setTitle(info['title'])
+            ai.setAlbum(info['album'])
+            ai.setDisc(info['discnumber'])
+            ai.setTrack(info['tracknumber'])
+            ai.setDuration(info['duration'])
+            ai.setPlayCount(info['playcount'])
+            ai.setComment(info['comment'])
+        else:
+            li.setInfo('music', info)
+
         return (url, li)
 
     def onPrePlayStarted(self):
