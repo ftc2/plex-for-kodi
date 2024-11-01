@@ -144,8 +144,10 @@ class Video(media.MediaItem, AudioCodecMixin):
         if self.subtitleStreams:
             for stream in self.subtitleStreams:
                 if stream.isSelected():
+                    sel_stream = stream
+                    stream_forced = sel_stream.forced.asBool()
                     if forced_subtitles_override and \
-                            stream.forced.asBool() and self.manually_selected_sub_stream != stream.id:
+                            stream_forced and self.manually_selected_sub_stream != sel_stream.id:
                         # try finding a non-forced variant of this stream
                         possible_alt = None
                         for alt_stream in self.subtitleStreams:
@@ -160,24 +162,24 @@ class Video(media.MediaItem, AudioCodecMixin):
                             util.DEBUG_LOG("Selecting stream {} instead of {}", possible_alt, stream)
                             stream.setSelected(False)
                             possible_alt.setSelected(True)
-                            self.current_subtitle_is_embedded = possible_alt.embedded
-                            if self._current_subtitle_idx != possible_alt.typeIndex:
-                                self._current_subtitle_idx = possible_alt.typeIndex
-                            return possible_alt
-                    elif (not self.manually_selected_sub_stream or self.manually_selected_sub_stream != stream.id) and \
-                        deselect_subtitles is not None and str(selas.languageCode) in deselect_subtitles:
+                            stream_forced = False
+
+                            sel_stream = possible_alt
+                    if (not self.manually_selected_sub_stream or self.manually_selected_sub_stream != sel_stream.id) and \
+                        deselect_subtitles is not None and str(selas.languageCode) in deselect_subtitles and \
+                          not stream_forced:
                         util.DEBUG_LOG("Not selecting {} subtitle stream because audio is {}",
-                                       stream.languageCode, selas.languageCode)
+                                       sel_stream.languageCode, selas.languageCode)
                         self._current_subtitle_idx = None
                         return
 
-                    if self._current_subtitle_idx != stream.typeIndex:
-                        self._current_subtitle_idx = stream.typeIndex
-                    self.current_subtitle_is_embedded = stream.embedded
-                    return stream
+                    if self._current_subtitle_idx != sel_stream.typeIndex:
+                        self._current_subtitle_idx = sel_stream.typeIndex
+                    self.current_subtitle_is_embedded = sel_stream.embedded
+                    return sel_stream
             if fallback:
                 stream = self.subtitleStreams[0]
-                if str(selas.languageCode) in deselect_subtitles:
+                if str(selas.languageCode) in deselect_subtitles and not stream.forced.asBool():
                     return
                 if self._current_subtitle_idx != stream.typeIndex:
                     self._current_subtitle_idx = stream.typeIndex
