@@ -130,13 +130,16 @@ class Video(media.MediaItem, AudioCodecMixin):
                 return self.audioStreams[0]
         return None
 
-    def selectedSubtitleStream(self, forced_subtitles_override=False, fallback=False, ref="_current_subtitle_idx"):
+    def selectedSubtitleStream(self, forced_subtitles_override=False, deselect_subtitles=None,
+                               fallback=False, ref="_current_subtitle_idx"):
         sidx = getattr(self, ref)
         if sidx:
             try:
                 return self.subtitleStreams[sidx]
             except IndexError:
                 pass
+
+        selas = self.selectedAudioStream()
 
         if self.subtitleStreams:
             for stream in self.subtitleStreams:
@@ -161,6 +164,12 @@ class Video(media.MediaItem, AudioCodecMixin):
                             if self._current_subtitle_idx != possible_alt.typeIndex:
                                 self._current_subtitle_idx = possible_alt.typeIndex
                             return possible_alt
+                    elif (not self.manually_selected_sub_stream or self.manually_selected_sub_stream != stream.id) and \
+                        deselect_subtitles is not None and str(selas.languageCode) in deselect_subtitles:
+                        util.DEBUG_LOG("Not selecting {} subtitle stream because audio is {}",
+                                       stream.languageCode, selas.languageCode)
+                        self._current_subtitle_idx = None
+                        return
 
                     if self._current_subtitle_idx != stream.typeIndex:
                         self._current_subtitle_idx = stream.typeIndex
@@ -168,6 +177,8 @@ class Video(media.MediaItem, AudioCodecMixin):
                     return stream
             if fallback:
                 stream = self.subtitleStreams[0]
+                if str(selas.languageCode) in deselect_subtitles:
+                    return
                 if self._current_subtitle_idx != stream.typeIndex:
                     self._current_subtitle_idx = stream.typeIndex
                 return stream
@@ -252,7 +263,7 @@ class Video(media.MediaItem, AudioCodecMixin):
         stream = self.selectedSubtitleStream(ref="_prev_subtitle_idx")
         if not stream:
             # use fallback
-            stream = self.selectedSubtitleStream(fallback=True, ref="_subtitleStreams_orig")
+            stream = self.selectedSubtitleStream(fallback=True)
         self.selectStream(stream, sync_to_server=sync_to_server)
         return stream
 
@@ -489,7 +500,9 @@ class PlayableVideo(Video, media.RelatedMixin):
             partID = self.mediaChoice.part.id
             streamIDs = []
             if self.mediaChoice.media.hasStreams():
-                subtitleStream = self.selectedSubtitleStream(fallback=False)
+                subtitleStream = self.selectedSubtitleStream(fallback=False,
+                                                             forced_subtitles_override=self.settings.getPreference("forced_subtitles_override", False),
+                                                             deselect_subtitles=self.settings.getPreference("disable_subtitle_languages", []))
                 videoStream = self.selectedVideoStream(fallback=True)
                 audioStream = self.selectedAudioStream(fallback=True)
                 streamIDs = []

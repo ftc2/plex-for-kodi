@@ -161,7 +161,10 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
             audio = T(32309, 'None')
 
         sss = self.video.selectedSubtitleStream(
-            forced_subtitles_override=util.getSetting("forced_subtitles_override", False))
+            forced_subtitles_override=util.getSetting("forced_subtitles_override", False),
+            deselect_subtitles=util.getSetting("disable_subtitle_languages", [])
+        )
+
         if sss:
             if len(self.video.subtitleStreams) > 1:
                 subtitle = u'{0} \u2022 {1} {2}'.format(sss.getTitle(metadata.apiTranslate), len(self.video.subtitleStreams) - 1, T(32307, 'More'))
@@ -337,8 +340,14 @@ def showAudioDialog(video, non_playback=False):
 def showSubtitlesDialog(video, non_playback=False):
     options = [(plexnet.plexstream.NoneStream(), 'None')]
     idx = None
+    sss = video.selectedSubtitleStream(
+        forced_subtitles_override=util.getSetting("forced_subtitles_override", False),
+        deselect_subtitles=util.getSetting("disable_subtitle_languages", [])
+    )
     for i, s in enumerate(video.subtitleStreams):
-        if s.isSelected():
+        if s == sss:
+    #for i, s in enumerate(video.subtitleStreams):
+    #    if s.isSelected():
             idx = i + 1
         options.append((s, s.getTitle(metadata.apiTranslate)))
 

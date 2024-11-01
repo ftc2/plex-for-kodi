@@ -11,6 +11,7 @@ from kodi_six import xbmc
 from kodi_six import xbmcgui
 from kodi_six import xbmcaddon
 from threading import Timer
+from iso639 import languages
 
 import lib.cache
 from lib import util
@@ -23,6 +24,8 @@ from . import windowutils
 
 UNDEF = "__UNDEF__"
 
+#MAIN_LANGUAGES = [l for l in languages if l.part1]
+#SEP_LANGUAGES= [l for l in languages if l.part2t and l not in MAIN_LANGUAGES]
 
 class Setting(object):
     type = None
@@ -520,6 +523,16 @@ class Settings(object):
                 BoolSetting('audio_hires', T(33079, ''),
                             True).description(
                     T(33080, '')
+                ),
+                MultiOptionsSetting(
+                    'disable_subtitle_languages', T(33691, "Native languages"),
+                    [],
+                    [(b, a) for a, b in sorted([(l.name, l.part2t) for l in languages if l.part1])]  # +
+                    # [(b, a) for a, b in sorted([(l.name, l.part2t) for l in SEP_LANGUAGES])]
+                ).description(
+                    T(33692, "When you usually watch things in a different language with subtitles, but are a"
+                             " native speaker of other languages, which you don't need subtitles for, prevent Plex "
+                             "from auto-selecting subtitles for those languages.")
                 ),
                 OptionsSetting(
                     'burn_subtitles',

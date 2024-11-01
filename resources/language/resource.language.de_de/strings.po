@@ -3019,3 +3019,19 @@ msgstr "Übersetzung aktualisiert"
 msgctxt "#33688"
 msgid "The currently in-use translation has been updated. In order to load the new translation, a Kodi restart is necessary. The addon will still run properly, but you might see badly or untranslated strings. Do you still want to run the addon?"
 msgstr "Die aktuell verwendete Übersetzung wurde aktualisiert. Damit die neue Übersetzung geladen wird, ist ein Kodi-Neustart nötig. Das Addon wird trotzdem funktionieren, aber Du könntest schlechte oder nicht übersetzte Texte sehen. Möchtest Du das Addon trotzdem starten?"
+
+msgctxt "#33689"
+msgid "Service running"
+msgstr "Service läuft"
+
+msgctxt "#33690"
+msgid "Last update check"
+msgstr "Letzte Update-Überprüfung"
+
+msgctxt "#33691"
+msgid "Native languages"
+msgstr "Muttersprachen"
+
+msgctxt "#33692"
+msgid "When you usually watch things in a different language with subtitles, but are a native speaker of other languages, which you don't need subtitles for, prevent Plex from auto-selecting subtitles for those languages."
+msgstr "Schaust Du normalerweise in einer anderen Sprache mit Untertiteln, bist aber Muttersprachler anderer Sprachen, für die Du keine Untertitel benötigst, halte Plex davon ab, Untertitel für diese Sprachen automatisch auszuwählen."

@@ -1210,7 +1210,7 @@ class SeekDialog(kodigui.BaseDialog):
             self.initialVideoSettings = dict(self.player.video.settings.prefOverrides)
             self.initialAudioStream = self.player.video.selectedAudioStream()
 
-        sss = self.player.video.selectedSubtitleStream()
+        sss = self.player.video.selectedSubtitleStream(deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
         if sss != self.initialSubtitleStream:
             self.initialSubtitleStream = sss
             changed.subtitle = True
@@ -1394,7 +1394,7 @@ class SeekDialog(kodigui.BaseDialog):
             if self.player.playState == self.player.STATE_PLAYING:
                 self.hideOSD()
             if self.isDirectPlay:
-                self.setSubtitles(honor_forced_subtitles_override=False)
+                self.setSubtitles(honor_forced_subtitles_override=False, honor_deselect_subtitles=False)
             else:
                 self.doSeek(self.trueOffset(), settings_changed=True)
             self.lastSubtitleNavAction = "auto_sync"
@@ -1428,13 +1428,14 @@ class SeekDialog(kodigui.BaseDialog):
         Selects the first subtitle or the next one
         """
         stream = self.player.video.cycleSubtitles(forward=forward, sync_to_server=False)
-        self.setSubtitles(honor_forced_subtitles_override=False)
+        self.setSubtitles(honor_forced_subtitles_override=False, honor_deselect_subtitles=False)
         util.showNotification(str(stream), time_ms=1500, header=util.T(32396, "Subtitles"))
         if self.isTranscoded:
             self.doSeek(self.trueOffset(), settings_changed=True)
 
-    def setSubtitles(self, do_sleep=False, honor_forced_subtitles_override=False):
-        self.handler.setSubtitles(do_sleep=do_sleep, honor_forced_subtitles_override=honor_forced_subtitles_override)
+    def setSubtitles(self, do_sleep=False, honor_forced_subtitles_override=False, honor_deselect_subtitles=False):
+        self.handler.setSubtitles(do_sleep=do_sleep, honor_forced_subtitles_override=honor_forced_subtitles_override,
+                                  honor_deselect_subtitles=honor_deselect_subtitles)
         if self.player.video.current_subtitle_is_embedded:
             # this is an embedded stream, seek back a second after setting the subtitle due to long standing kodi
             # issue: https://github.com/xbmc/xbmc/issues/21086

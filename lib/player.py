@@ -709,14 +709,15 @@ class SeekPlayerHandler(BasePlayerHandler):
                 # return self._subtitleStreamOffset
         return 0
 
-    def setSubtitles(self, do_sleep=True, honor_forced_subtitles_override=True):
+    def setSubtitles(self, do_sleep=True, honor_forced_subtitles_override=True, honor_deselect_subtitles=True):
         if not self.player.video:
             util.LOG("Warning: SetSubtitles: no player.video object available")
             return
 
         subs = self.player.video.selectedSubtitleStream(
             forced_subtitles_override=honor_forced_subtitles_override and util.getSetting("forced_subtitles_override",
-                                                                                          False))
+                                                                                          False),
+            deselect_subtitles=honor_deselect_subtitles and util.getSetting("disable_subtitle_languages", []))
 
         # we want to get the subtitle stream offset regardless of whether we have subtitles selected or not,
         # as the subtitle amount might change during playback (e.g. kodi subtitle download adds one to the list)
