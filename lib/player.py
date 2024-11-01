@@ -470,9 +470,9 @@ class SeekPlayerHandler(BasePlayerHandler):
                 if currIdx != self.player.video._current_subtitle_idx + self.subtitleStreamOffset:
                     util.LOG("Embedded Subtitle index was incorrect ({}), setting to: {}".
                              format(currIdx, self.player.video._current_subtitle_idx + self.subtitleStreamOffset))
-                    self.dialog.setSubtitles()
                 else:
                     util.DEBUG_LOG("Embedded subtitle was correctly set in Kodi")
+                self.dialog.setSubtitles()
             except:
                 util.ERROR("Exception when trying to check for embedded subtitles")
 
@@ -710,6 +710,7 @@ class SeekPlayerHandler(BasePlayerHandler):
         return 0
 
     def setSubtitles(self, do_sleep=True, honor_forced_subtitles_override=True, honor_deselect_subtitles=True):
+        util.DEBUG_LOG("SeekHandler: setSubtitles")
         if not self.player.video:
             util.LOG("Warning: SetSubtitles: no player.video object available")
             return
