@@ -40,7 +40,7 @@
         <width>1000</width>
         <height>{{ vscale(610) }}</height>
         <texture flipy="true" border="10">script.plex/white-square-top-rounded.png</texture>
-        <colordiffuse>F2606060</colordiffuse>
+        <colordiffuse>D3111111</colordiffuse>
     </control>
     <control type="image">
         <posx>0</posx>
@@ -83,6 +83,8 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
+                <scroll>true</scroll>
+                <scrollspeed>15</scrollspeed>
                 <label>$INFO[ListItem.Label]</label>
             </control>
             <control type="label">
@@ -94,6 +96,8 @@
                 <align>right</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
+                <scroll>true</scroll>
+                <scrollspeed>15</scrollspeed>
                 <label>$INFO[ListItem.Label2]</label>
             </control>
         </itemlayout>
@@ -114,6 +118,8 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <textcolor>FF000000</textcolor>
+                <scroll>true</scroll>
+                <scrollspeed>15</scrollspeed>
                 <label>$INFO[ListItem.Label]</label>
             </control>
             <control type="label">
@@ -125,6 +131,8 @@
                 <align>right</align>
                 <aligny>center</aligny>
                 <textcolor>FF000000</textcolor>
+                <scroll>true</scroll>
+                <scrollspeed>15</scrollspeed>
                 <label>$INFO[ListItem.Label2]</label>
             </control>
         </focusedlayout>
