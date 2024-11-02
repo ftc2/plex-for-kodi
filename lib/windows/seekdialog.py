@@ -7,6 +7,8 @@ from collections import OrderedDict
 
 from kodi_six import xbmc
 from kodi_six import xbmcgui
+from six import ensure_str
+
 from plexnet import plexapp
 from plexnet.util import AttributeDict
 from plexnet.exceptions import ServerNotOwned, NotFound
@@ -1324,53 +1326,119 @@ class SeekDialog(kodigui.BaseDialog):
 
         if choice['key'] == 'download':
             self.hideOSD()
-            if self.handler and self.handler.player and self.handler.player.playerObject \
-                    and util.getSetting('calculate_oshash', False):
-                meta = self.handler.player.playerObject.metadata
-                if not meta.size:
-                    util.LOG("Can't calculate OpenSubtitles hash because we're transcoding")
+            usePlexSubsDL = True
+            if usePlexSubsDL:
+                was_playing = False
+                if self.player.playState == self.player.STATE_PLAYING:
+                    was_playing = True
+                    self.player.pause()
+                video = self.player.video
+                from iso639 import languages
+                audio = video.selectedAudioStream()
+                language = languages.get(part1="en")
+                if audio:
+                    audio_language = languages.get(part2t=audio.languageCode)
+                    if audio_language:
+                        language = audio_language
 
-                else:
-                    oss_hash = util.getOpenSubtitlesHash(meta.size, meta.streamUrls[0])
-                    if oss_hash:
-                        util.DEBUG_LOG("OpenSubtitles hash: {}", oss_hash)
-                        util.setGlobalProperty("current_oshash", oss_hash, base='videoinfo.{0}')
+                util.DEBUG_LOG("Using language {} for subtitle search", ensure_str(repr(language)))
+
+                with busy.BusyBlockingContext(delay=True):
+                    subs = video.findSubtitles(language=language.part1)
+
+                if subs:
+                    with self.propertyContext('settings.visible'):
+                        options = []
+                        for sub in sorted(subs, key=lambda s: s.score.asInt(), reverse=True):
+                            options.append((sub.key, ("{}, Score: {}".format(sub.providerTitle, sub.score), sub.title)))
+                        choice = playersettings.showOptionsDialog("Download subtitles: {}".format(ensure_str(language.name)),
+                                                                  options, trim=False)
+                        if choice is None:
+                            return
+
+                        with busy.BusyBlockingContext(delay=True):
+                            video.downloadSubtitles(choice)
+                            tries = 0
+                            sub_downloaded = False
+                            util.DEBUG_LOG("Waiting for subtitle download: {}", choice)
+                            while tries < 50:
+                                for stream in video.findSubtitles():
+                                    if stream.downloaded.asBool():
+                                        util.DEBUG_LOG("Subtitle downloaded: {}", stream.extendedDisplayTitle)
+                                        sub_downloaded = stream
+                                        break
+                                if sub_downloaded:
+                                    break
+                                tries += 1
+                                util.MONITOR.waitForAbort(0.1)
+                            # stream will be auto selected
+                            self.player.handler._subtitleStreamOffset = None
+                            video.reload(includeExternalMedia=1, skipRefresh=1)
+                            # reselect fresh media
+                            media = [m for m in video.media() if m.ratingKey == video.mediaChoice.media.ratingKey][0]
+                            self.player.video.setMediaChoice(media=media,
+                                                             partIndex=self.player.video.mediaChoice.partIndex)
+                            # double reload is probably not necessary
+                            video.reload(fromMediaChoice=True, forceSubtitlesFromPlex=True)
+
+                            # CHECK EMBEDDED IS WEIRD
+                            for stream in self.player.video.subtitleStreams:
+                                if stream.selected.asBool():
+                                    util.DEBUG_LOG("Selecting subtitle: {}", stream.extendedDisplayTitle)
+                                    self.setSubtitles(honor_forced_subtitles_override=False,
+                                                      honor_deselect_subtitles=False, ref=None)
+                                    if was_playing and self.player.playState == self.player.STATE_PAUSED:
+                                        self.player.pause()
+                                    return
+
             else:
-                util.setGlobalProperty("current_oshash", '', base='videoinfo.{0}')
-            self.lastSubtitleNavAction = "download"
+                if self.handler and self.handler.player and self.handler.player.playerObject \
+                        and util.getSetting('calculate_oshash', False):
+                    meta = self.handler.player.playerObject.metadata
+                    if not meta.size:
+                        util.LOG("Can't calculate OpenSubtitles hash because we're transcoding")
 
-            # remove the Year info from the current video info tag for better OSS search results
-            t = self.player.getVideoInfoTag()
-            changed_info_tag = False
-            item = xbmcgui.ListItem()
-            item.setPath(self.player.getPlayingFile())
-            if t:
-                year = t.getYear()
-                if year:
+                    else:
+                        oss_hash = util.getOpenSubtitlesHash(meta.size, meta.streamUrls[0])
+                        if oss_hash:
+                            util.DEBUG_LOG("OpenSubtitles hash: {}", oss_hash)
+                            util.setGlobalProperty("current_oshash", oss_hash, base='videoinfo.{0}')
+                else:
+                    util.setGlobalProperty("current_oshash", '', base='videoinfo.{0}')
+                self.lastSubtitleNavAction = "download"
+
+                # remove the Year info from the current video info tag for better OSS search results
+                t = self.player.getVideoInfoTag()
+                changed_info_tag = False
+                item = xbmcgui.ListItem()
+                item.setPath(self.player.getPlayingFile())
+                if t:
+                    year = t.getYear()
+                    if year:
+                        if util.KODI_VERSION_MAJOR >= 20:
+                            vi = item.getVideoInfoTag()
+                            vi.setYear(0)
+                        else:
+                            item.setInfo("video", {"year": 0})
+                        util.DEBUG_LOG("Removing videoInfo year for subtitle search")
+                        self.player.updateInfoTag(item)
+                        changed_info_tag = year
+
+                builtin.ActivateWindow('SubtitleSearch')
+                # wait for the window to activate
+                while not xbmc.getCondVisibility('Window.IsActive(SubtitleSearch)'):
+                    util.MONITOR.waitForAbort(0.1)
+                # wait for the window to close
+                while xbmc.getCondVisibility('Window.IsActive(SubtitleSearch)'):
+                    util.MONITOR.waitForAbort(0.1)
+
+                if changed_info_tag:
                     if util.KODI_VERSION_MAJOR >= 20:
                         vi = item.getVideoInfoTag()
-                        vi.setYear(0)
+                        vi.setYear(changed_info_tag)
                     else:
-                        item.setInfo("video", {"year": 0})
-                    util.DEBUG_LOG("Removing videoInfo year for subtitle search")
+                        item.setInfo("video", {"year": changed_info_tag})
                     self.player.updateInfoTag(item)
-                    changed_info_tag = year
-
-            builtin.ActivateWindow('SubtitleSearch')
-            # wait for the window to activate
-            while not xbmc.getCondVisibility('Window.IsActive(SubtitleSearch)'):
-                util.MONITOR.waitForAbort(0.1)
-            # wait for the window to close
-            while xbmc.getCondVisibility('Window.IsActive(SubtitleSearch)'):
-                util.MONITOR.waitForAbort(0.1)
-
-            if changed_info_tag:
-                if util.KODI_VERSION_MAJOR >= 20:
-                    vi = item.getVideoInfoTag()
-                    vi.setYear(changed_info_tag)
-                else:
-                    item.setInfo("video", {"year": changed_info_tag})
-                self.player.updateInfoTag(item)
 
         elif choice['key'] == 'delay':
             self.hideOSD()
@@ -1433,9 +1501,10 @@ class SeekDialog(kodigui.BaseDialog):
         if self.isTranscoded:
             self.doSeek(self.trueOffset(), settings_changed=True)
 
-    def setSubtitles(self, do_sleep=False, honor_forced_subtitles_override=False, honor_deselect_subtitles=False):
+    def setSubtitles(self, do_sleep=False, honor_forced_subtitles_override=False, honor_deselect_subtitles=False,
+                     ref="_current_subtitle_idx"):
         self.handler.setSubtitles(do_sleep=do_sleep, honor_forced_subtitles_override=honor_forced_subtitles_override,
-                                  honor_deselect_subtitles=honor_deselect_subtitles)
+                                  honor_deselect_subtitles=honor_deselect_subtitles, ref=ref)
         if self.player.video.current_subtitle_is_embedded:
             # this is an embedded stream, seek back a second after setting the subtitle due to long standing kodi
             # issue: https://github.com/xbmc/xbmc/issues/21086

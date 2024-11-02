@@ -660,25 +660,39 @@ class SeekPlayerHandler(BasePlayerHandler):
 
             # when mapped, Kodi finds external subs on its own and places them at the top of the list, before
             # embedded subs.
-            try:
-                playerID = kodijsonrpc.rpc.Player.GetActivePlayers()[0]["playerid"]
-                kodisubs = kodijsonrpc.rpc.Player.GetProperties(playerid=playerID, properties=['subtitles'])["subtitles"]
-            except IndexError:
+            kodisubs = None
+            tries = 0
+            while not kodisubs and tries < 20:
+                try:
+                    playerID = kodijsonrpc.rpc.Player.GetActivePlayers()[0]["playerid"]
+                    kodisubs = kodijsonrpc.rpc.Player.GetProperties(playerid=playerID, properties=['subtitles'])["subtitles"]
+                    break
+                except IndexError:
+                    pass
+                tries += 1
+                util.MONITOR.waitForAbort(0.1)
+            if not kodisubs:
                 # this can happen occasionally, if the player isn't ready, yet, but we account for that
+                util.DEBUG_LOG("SeekHandler: subtitleStreamOffset: Returning zero as player not available")
                 return 0
-            else:
+            if kodisubs:
                 # find embedded subtitle stream in Plex
                 ess = None
                 ext_subs_amount = 0
                 for ss in self.player.video.subtitleStreams:
                     if not ess and ss.embedded:
                         ess = ss
-                    elif not ss.embedded:
+                    # ss.score: only downloaded external subtitles have a score; skip them, as they're not visible to
+                    # Kodi
+                    elif not ss.embedded and not ss.score:
                         ext_subs_amount += 1
 
                 if not ess:
                     self._subtitleStreamOffset = 0
+                    util.DEBUG_LOG("SeekHandler: subtitleStreamOffset: Returning zero as we didn't find an embedded subtitle")
                     return 0
+
+                util.DEBUG_LOG("SeekHandler: subtitleStreamOffset: Found embedded subtitle at: {}", ext_subs_amount)
 
                 # find embedded subtitle stream in Kodi stream list
                 # we know Kodi puts external subtitles first, start there (Kodi might see more external subs or the PMS
@@ -692,9 +706,11 @@ class SeekPlayerHandler(BasePlayerHandler):
                             sub['name'] == six.ensure_str(ess.title) and languages.get(
                                 part2b=sub['language']) == ess_lang):
                         self._subtitleStreamOffset = sub['index'] - ess.typeIndex
+                        util.DEBUG_LOG("SeekHandler: subtitleStreamOffset: Returning offset: {} ({})",
+                                       self._subtitleStreamOffset, sub)
                         return self._subtitleStreamOffset
 
-                util.LOG("Couldn't find embedded subtitle in Kodi subtitle list: {}, assuming no difference", ess)
+                util.LOG("SeekHandler: Couldn't find embedded subtitle in Kodi subtitle list: {}, assuming no difference", ess)
                 self._subtitleStreamOffset = 0
 
                 # old implementation
@@ -709,7 +725,8 @@ class SeekPlayerHandler(BasePlayerHandler):
                 # return self._subtitleStreamOffset
         return 0
 
-    def setSubtitles(self, do_sleep=True, honor_forced_subtitles_override=True, honor_deselect_subtitles=True):
+    def setSubtitles(self, do_sleep=True, honor_forced_subtitles_override=True, honor_deselect_subtitles=True,
+                     ref="_current_subtitle_idx"):
         util.DEBUG_LOG("SeekHandler: setSubtitles")
         if not self.player.video:
             util.LOG("Warning: SetSubtitles: no player.video object available")
@@ -718,7 +735,9 @@ class SeekPlayerHandler(BasePlayerHandler):
         subs = self.player.video.selectedSubtitleStream(
             forced_subtitles_override=honor_forced_subtitles_override and util.getSetting("forced_subtitles_override",
                                                                                           False),
-            deselect_subtitles=honor_deselect_subtitles and util.getSetting("disable_subtitle_languages", []))
+            deselect_subtitles=honor_deselect_subtitles and util.getSetting("disable_subtitle_languages", []),
+            ref=ref
+        )
 
         # we want to get the subtitle stream offset regardless of whether we have subtitles selected or not,
         # as the subtitle amount might change during playback (e.g. kodi subtitle download adds one to the list)

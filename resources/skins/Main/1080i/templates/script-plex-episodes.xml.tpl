@@ -355,12 +355,14 @@
             </control>
             <control type="label">
                 <visible>!String.IsEmpty(Container(400).ListItem.Property(subtitles))</visible>
-                <width>auto</width>
+                <width max="460">auto</width>
                 <height>{{ vscale(34) }}</height>
                 <font>font12</font>
                 <align>left</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
+                <scroll>true</scroll>
+                <scrollspeed>15</scrollspeed>
                 <label>$INFO[Container(400).ListItem.Property(subtitles)]</label>
             </control>
         </control>
