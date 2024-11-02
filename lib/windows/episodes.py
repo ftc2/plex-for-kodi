@@ -335,7 +335,10 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
 
         vp = VIDEO_PROGRESS.get(self.show_.ratingKey, {}).get(self.season.ratingKey, {})
 
-        if self.manuallySelected and not VIDEO_PROGRESS:
+        if (self.manuallySelected and not VIDEO_PROGRESS) or self.cameFrom == "info":
+            if self.cameFrom == "info":
+                self.cameFrom = None
+                return
             util.DEBUG_LOG("Episodes: ReInit: Not doing anything, as we've previously manually selected "
                            "this item and don't have progress")
             return
