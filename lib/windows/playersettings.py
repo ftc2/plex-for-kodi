@@ -237,6 +237,7 @@ class SelectDialog(kodigui.BaseDialog, util.CronReceiver):
         self.nonPlayback = kwargs.get('non_playback')
         self.lastSelectedItem = self.selectedIdx if self.selectedIdx is not None else 0
         self.roundRobin = kwargs.get('round_robin', True)
+        self.trim = kwargs.get('trim', True)
 
     def onFirstInit(self):
         self.optionsList = kodigui.ManagedControlList(self, self.OPTIONS_LIST_ID, 8)
@@ -303,7 +304,8 @@ class SelectDialog(kodigui.BaseDialog, util.CronReceiver):
             title2 = ''
             if isinstance(title1, (list, set, tuple)):
                 title1, title2 = title1
-            item = kodigui.ManagedListItem(title1, plexnet.util.trimString(title2, limit=40), data_source=ds)
+            item = kodigui.ManagedListItem(title1, self.trim and plexnet.util.trimString(title2, limit=40) or title2,
+                                           data_source=ds)
             items.append(item)
 
         self.optionsList.reset()
@@ -315,8 +317,9 @@ class SelectDialog(kodigui.BaseDialog, util.CronReceiver):
         self.setFocusId(self.OPTIONS_LIST_ID)
 
 
-def showOptionsDialog(heading, options, non_playback=False, selected_idx=None):
-    w = SelectDialog.open(heading=heading, options=options, non_playback=non_playback, selected_idx=selected_idx)
+def showOptionsDialog(heading, options, non_playback=False, selected_idx=None, trim=True):
+    w = SelectDialog.open(heading=heading, options=options, non_playback=non_playback, selected_idx=selected_idx,
+                          trim=trim)
     choice = w.choice
     del w
     util.garbageCollect()
