@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 from kodi_six import xbmc
 from kodi_six import xbmcgui
-from six import ensure_str
 
 from plexnet import plexapp
 from plexnet.util import AttributeDict
@@ -23,7 +22,7 @@ from . import busy
 from . import dropdown
 from . import kodigui
 from . import playersettings
-from .mixins import SpoilersMixin
+from .mixins import SpoilersMixin, PlexSubtitleDownloadMixin
 
 KEY_MOVE_SET = frozenset(
     (
@@ -89,7 +88,7 @@ MARKER_CHAPTER_OVERLAP_THRES = 30000  # 30 seconds
 MARKER_END_JUMP_OFF = 1000
 
 
-class SeekDialog(kodigui.BaseDialog):
+class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
     """
     fixme: This is a convoluted mess.
     """
@@ -145,6 +144,7 @@ class SeekDialog(kodigui.BaseDialog):
 
     def __init__(self, *args, **kwargs):
         super(SeekDialog, self).__init__(*args, **kwargs)
+        PlexSubtitleDownloadMixin.__init__(self, *args, **kwargs)
 
         # fixme: heyo, there's a lot of disorder in here.
         self.handler = kwargs.get('handler')
@@ -1332,64 +1332,12 @@ class SeekDialog(kodigui.BaseDialog):
                 if self.player.playState == self.player.STATE_PLAYING:
                     was_playing = True
                     self.player.pause()
-                video = self.player.video
-                from iso639 import languages
-                audio = video.selectedAudioStream()
-                language = languages.get(part1="en")
-                if audio:
-                    audio_language = languages.get(part2t=audio.languageCode)
-                    if audio_language:
-                        language = audio_language
-
-                util.DEBUG_LOG("Using language {} for subtitle search", ensure_str(repr(language)))
-
-                with busy.BusyBlockingContext(delay=True):
-                    subs = video.findSubtitles(language=language.part1)
-
-                if subs:
-                    with self.propertyContext('settings.visible'):
-                        options = []
-                        for sub in sorted(subs, key=lambda s: s.score.asInt(), reverse=True):
-                            options.append((sub.key, ("{}, Score: {}".format(sub.providerTitle, sub.score), sub.title)))
-                        choice = playersettings.showOptionsDialog("Download subtitles: {}".format(ensure_str(language.name)),
-                                                                  options, trim=False)
-                        if choice is None:
-                            return
-
-                        with busy.BusyBlockingContext(delay=True):
-                            video.downloadSubtitles(choice)
-                            tries = 0
-                            sub_downloaded = False
-                            util.DEBUG_LOG("Waiting for subtitle download: {}", choice)
-                            while tries < 50:
-                                for stream in video.findSubtitles():
-                                    if stream.downloaded.asBool():
-                                        util.DEBUG_LOG("Subtitle downloaded: {}", stream.extendedDisplayTitle)
-                                        sub_downloaded = stream
-                                        break
-                                if sub_downloaded:
-                                    break
-                                tries += 1
-                                util.MONITOR.waitForAbort(0.1)
-                            # stream will be auto selected
-                            self.player.handler._subtitleStreamOffset = None
-                            video.reload(includeExternalMedia=1, skipRefresh=1)
-                            # reselect fresh media
-                            media = [m for m in video.media() if m.ratingKey == video.mediaChoice.media.ratingKey][0]
-                            self.player.video.setMediaChoice(media=media,
-                                                             partIndex=self.player.video.mediaChoice.partIndex)
-                            # double reload is probably not necessary
-                            video.reload(fromMediaChoice=True, forceSubtitlesFromPlex=True)
-
-                            # CHECK EMBEDDED IS WEIRD
-                            for stream in self.player.video.subtitleStreams:
-                                if stream.selected.asBool():
-                                    util.DEBUG_LOG("Selecting subtitle: {}", stream.extendedDisplayTitle)
-                                    self.setSubtitles(honor_forced_subtitles_override=False,
-                                                      honor_deselect_subtitles=False, ref=None)
-                                    if was_playing and self.player.playState == self.player.STATE_PAUSED:
-                                        self.player.pause()
-                                    return
+                downloaded = self.downloadPlexSubtitles(self.player.video)
+                if downloaded:
+                    self.setSubtitles(honor_forced_subtitles_override=False,
+                                      honor_deselect_subtitles=False, ref=None)
+                if was_playing and self.player.playState == self.player.STATE_PAUSED:
+                    self.player.pause()
 
             else:
                 if self.handler and self.handler.player and self.handler.player.playerObject \
