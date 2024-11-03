@@ -22,6 +22,7 @@ from . import busy
 from . import dropdown
 from . import kodigui
 from . import playersettings
+from . import optionsdialog
 from .mixins import SpoilersMixin, PlexSubtitleDownloadMixin
 
 KEY_MOVE_SET = frozenset(
@@ -1326,8 +1327,17 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
 
         if choice['key'] == 'download':
             self.hideOSD()
-            usePlexSubsDL = True
-            if usePlexSubsDL:
+            subs_dl_source = util.getSetting('subtitle_download_from', 'plex')
+            if subs_dl_source == 'ask':
+                button = optionsdialog.show(
+                    T(33693, 'Download subtitles using'),
+                    T(33695, 'Where do you want to download subtitles from?'),
+                    'Plex',
+                    'Kodi'
+                )
+
+                subs_dl_source = button == 0 and 'plex' or 'kodi'
+            if subs_dl_source == 'plex':
                 was_playing = False
                 if self.player.playState == self.player.STATE_PLAYING:
                     was_playing = True

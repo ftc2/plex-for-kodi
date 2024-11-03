@@ -3035,3 +3035,15 @@ msgstr "Muttersprachen"
 msgctxt "#33692"
 msgid "When you usually watch things in a different language with subtitles, but are a native speaker of other languages, which you don't need subtitles for, prevent Plex from auto-selecting subtitles for those languages."
 msgstr "Schaust Du normalerweise in einer anderen Sprache mit Untertiteln, bist aber Muttersprachler anderer Sprachen, für die Du keine Untertitel benötigst, halte Plex davon ab, Untertitel für diese Sprachen automatisch auszuwählen."
+
+msgctxt "#33693"
+msgid "Download subtitles using"
+msgstr "Untertitel herunterladen mit"
+
+msgctxt "#33694"
+msgid "Ask"
+msgstr "Fragen"
+
+msgctxt "#33695"
+msgid "Where do you want to download subtitles from?"
+msgstr "Woher möchtest du Untertitel herunterladen?"

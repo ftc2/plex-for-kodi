@@ -535,6 +535,16 @@ class Settings(object):
                              "from auto-selecting subtitles for those languages.")
                 ),
                 OptionsSetting(
+                    'subtitle_download_from',
+                    T(33693, 'Download subtitles using'),
+                    'plex',
+                    (
+                        ('ask', T(33694, 'Ask')),
+                        ('plex', 'Plex'),
+                        ('kodi', 'Kodi'),
+                    )
+                ),
+                OptionsSetting(
                     'burn_subtitles',
                     T(32031, 'Burn-in Subtitles'),
                     'auto',
