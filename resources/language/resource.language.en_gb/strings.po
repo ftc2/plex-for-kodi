@@ -1081,10 +1081,6 @@ msgctxt "#32492"
 msgid "Kodi Subtitle Settings"
 msgstr ""
 
-msgctxt "#32493"
-msgid "When a media file has a forced/foreign subtitle for a subtitle-enabled language, the Plex Media Server preselects it. This behaviour is usually not necessary and not configurable. This setting fixes that by ignoring the PMSs decision and selecting the same language without a forced flag if possible."
-msgstr ""
-
 msgctxt "#32495"
 msgid "Skip intro"
 msgstr ""
@@ -1580,10 +1576,6 @@ msgstr ""
 
 msgctxt "#32940"
 msgid "Video Player"
-msgstr ""
-
-msgctxt "#32941"
-msgid "Forced subtitles fix"
 msgstr ""
 
 msgctxt "#32942"
@@ -2455,4 +2447,27 @@ msgstr ""
 
 msgctxt "#33695"
 msgid "Where do you want to download subtitles from?"
+msgstr ""
+
+msgctxt "#33696"
+msgid "No subtitles found."
+msgstr ""
+
+#: things in curly brackets are variables, don't translate them!
+msgctxt "#33697"
+msgid "{provider_title}, Score: {subtitle_score}{subtitle_info}"
+msgstr ""
+
+#: hearing impaired subtitle flag
+msgctxt "#33698"
+msgid "HI"
+msgstr ""
+
+#: forced subtitle flag
+msgctxt "#33699"
+msgid "forced"
+msgstr ""
+
+msgctxt "#33700"
+msgid "Download subtitles: {}"
 msgstr ""

@@ -260,14 +260,26 @@ class PlexSubtitleDownloadMixin(object):
         util.DEBUG_LOG("Using language {} for subtitle search", ensure_str(repr(language)))
 
         with busy.BusyBlockingContext(delay=True):
-            subs = video.findSubtitles(language=language.part1)
+            subs = video.findSubtitles(language=language.part1, hearing_impaired=pnUtil.ACCOUNT.subtitlesSDH,
+                                       forced=pnUtil.ACCOUNT.subtitlesForced)
 
         if subs:
             with self.propertyContext('settings.visible'):
                 options = []
                 for sub in sorted(subs, key=lambda s: s.score.asInt(), reverse=True):
-                    options.append((sub.key, ("{}, Score: {}".format(sub.providerTitle, sub.score), sub.title)))
-                choice = playersettings.showOptionsDialog("Download subtitles: {}".format(ensure_str(language.name)),
+                    info = ""
+                    if sub.hearingImpaired.asInt() or sub.forced.asInt():
+                        add = []
+                        if sub.hearingImpaired.asInt():
+                            add.append(T(33698, "HI"))
+                        if sub.forced.asInt():
+                            add.append(T(33699, "forced"))
+                        info = " ({})".format(", ".join(add))
+                    options.append((sub.key, (T(33697, "{provider_title}, Score: {subtitle_score}{subtitle_info}").format(
+                        provider_title=sub.providerTitle,
+                        subtitle_score=sub.score,
+                        subtitle_info=info), sub.title)))
+                choice = playersettings.showOptionsDialog(T(33700, "Download subtitles: {}").format(ensure_str(language.name)),
                                                           options, trim=False)
                 if choice is None:
                     return
@@ -298,3 +310,6 @@ class PlexSubtitleDownloadMixin(object):
                         if stream.selected.asBool():
                             util.DEBUG_LOG("Selecting subtitle: {}", stream.extendedDisplayTitle)
                             return stream
+        else:
+            util.showNotification(util.T(33696, "No Subtitles found."),
+                                  time_ms=1500, header=util.T(32396, "Subtitles"))

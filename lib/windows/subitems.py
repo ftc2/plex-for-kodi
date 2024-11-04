@@ -5,7 +5,7 @@ import threading
 
 from kodi_six import xbmc
 from kodi_six import xbmcgui
-from plexnet import playlist
+from plexnet import playlist, util as pnUtil
 
 from lib import metadata
 from lib import player
@@ -160,7 +160,7 @@ class ShowWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMixin, 
         self.setProperty('audio', sas and sas.getTitle() or 'None')
 
         sss = self.mediaItem.selectedSubtitleStream(
-            forced_subtitles_override=util.getSetting("forced_subtitles_override", False),
+            forced_subtitles_override=pnUtil.ACCOUNT.subtitlesForced in (0, 3),
             deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
         self.setProperty('subtitles', sss and sss.getTitle() or 'None')
 

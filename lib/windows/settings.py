@@ -562,13 +562,6 @@ class Settings(object):
                     T(33656, 'Only for External SRT subtitles. The PMS setting for voice activity detection '
                              'has to be enabled for this to work.')
                 ),
-                BoolSetting('forced_subtitles_override', T(32941, 'Forced subtitles fix'),
-                            False).description(
-                    T(32493, 'When a media file has a forced/foreign subtitle for a subtitle-enabled language, the Plex'
-                             ' Media Server preselects it. This behaviour is usually not necessary and not configurable'
-                             '. This setting fixes that by ignoring the PMSs decision and selecting the same language '
-                             'without a forced flag if possible.')
-                ),
                 BoolSetting('calculate_oshash', T(32958, 'Calculate OpenSubtitles.com hash'),
                             False).description(
                     T(32959, '')

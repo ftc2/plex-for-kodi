@@ -733,8 +733,7 @@ class SeekPlayerHandler(BasePlayerHandler):
             return
 
         subs = self.player.video.selectedSubtitleStream(
-            forced_subtitles_override=honor_forced_subtitles_override and util.getSetting("forced_subtitles_override",
-                                                                                          False),
+            forced_subtitles_override=honor_forced_subtitles_override and plexnetUtil.ACCOUNT.subtitlesForced in (0, 3),
             deselect_subtitles=honor_deselect_subtitles and util.getSetting("disable_subtitle_languages", []),
             ref=ref
         )
