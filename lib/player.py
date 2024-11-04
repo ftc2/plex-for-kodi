@@ -662,7 +662,7 @@ class SeekPlayerHandler(BasePlayerHandler):
             # embedded subs.
             kodisubs = None
             tries = 0
-            while not kodisubs and tries < 20:
+            while not kodisubs and tries < 50:
                 try:
                     playerID = kodijsonrpc.rpc.Player.GetActivePlayers()[0]["playerid"]
                     kodisubs = kodijsonrpc.rpc.Player.GetProperties(playerid=playerID, properties=['subtitles'])["subtitles"]
@@ -673,7 +673,8 @@ class SeekPlayerHandler(BasePlayerHandler):
                 util.MONITOR.waitForAbort(0.1)
             if not kodisubs:
                 # this can happen occasionally, if the player isn't ready, yet, but we account for that
-                util.DEBUG_LOG("SeekHandler: subtitleStreamOffset: Returning zero as player not available")
+                util.DEBUG_LOG("SeekHandler: subtitleStreamOffset: Returning zero as player not available or no "
+                               "subtitles found")
                 return 0
             if kodisubs:
                 # find embedded subtitle stream in Plex
