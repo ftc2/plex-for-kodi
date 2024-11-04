@@ -54,6 +54,11 @@ class MyPlexAccount(object):
         self.revalidatePlexPass = False
         self.homeUsers = []
 
+        # defaultSubtitleAccessibility: 0 = prefer non SDH, 1 = prefer SDH, 2 = only SDH, 3 = only non SDH
+        # defaultSubtitleForced: 0 = prefer non forced, 1 = prefer forced, 2 = only forced, 3 = only non forced
+        self.subtitlesSDH = 0
+        self.subtitlesForced = 0
+
     def init(self):
         self.loadState()
 
@@ -71,7 +76,9 @@ class MyPlexAccount(object):
             'isSecure': self.isSecure,
             'adminHasPlexPass': self.adminHasPlexPass,
             'thumb': self.thumb,
-            'lastHomeUserUpdate': self.lastHomeUserUpdate
+            'lastHomeUserUpdate': self.lastHomeUserUpdate,
+            'subtitlesSDH': self.subtitlesSDH,
+            'subtitlesForced': self.subtitlesForced,
         }
 
         if self.cacheHomeUsers:
@@ -109,6 +116,8 @@ class MyPlexAccount(object):
                 self.adminHasPlexPass = obj.get('adminHasPlexPass') or self.adminHasPlexPass
                 self.thumb = obj.get('thumb')
                 self.lastHomeUserUpdate = obj.get('lastHomeUserUpdate')
+                self.subtitlesSDH = obj.get('subtitlesSDH', 0)
+                self.subtitlesForced = obj.get('subtitlesForced', 0)
                 if self.cacheHomeUsers:
                     self.homeUsers = [HomeUser(data) for data in obj.get('homeUsers', [])]
                     self.setAdminByCHU()
@@ -141,6 +150,8 @@ class MyPlexAccount(object):
         util.LOG("Protected: {0}", self.isProtected)
         util.LOG("Admin: {0}", self.isAdmin)
         util.LOG("AdminPlexPass: {0}", self.adminHasPlexPass)
+        util.LOG("subtitlesSDH: {0}", self.subtitlesSDH)
+        util.LOG("subtitlesForced: {0}", self.subtitlesForced)
 
     def getHomeSubscription(self):
         """
@@ -183,6 +194,11 @@ class MyPlexAccount(object):
             self.isManaged = data.attrib.get('restricted') == '1'
             self.isSecure = data.attrib.get('secure') == '1'
             self.hasQueue = bool(data.attrib.get('queueEmail'))
+
+            # profile settings
+            prof = data.find('profile_settings')
+            self.subtitlesSDH = int(prof.attrib.get('default_subtitle_accessibility', 0))
+            self.subtitlesForced = int(prof.attrib.get('default_subtitle_forced', 0))
 
             # PIN
             if data.attrib.get('pin'):
