@@ -543,7 +543,7 @@ class Settings(object):
                         ('plex', 'Plex'),
                         ('kodi', 'Kodi'),
                     )
-                ),
+                ).description(T(33695, "Where do you want to download subtitles from?")),
                 OptionsSetting(
                     'burn_subtitles',
                     T(32031, 'Burn-in Subtitles'),
