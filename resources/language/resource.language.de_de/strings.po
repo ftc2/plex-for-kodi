@@ -3041,3 +3041,11 @@ msgstr "Woher möchtest du Untertitel herunterladen?"
 msgctxt "#33696"
 msgid "No subtitles found."
 msgstr "Keine Untertitel gefunden."
+
+msgctxt "#33701"
+msgid "Fallback to Kodi"
+msgstr "Falle auf Kodi zurück"
+
+msgctxt "#33702"
+msgid "When no subtitles are found via the Plex subtitle search, fall back to Kodi subtitle search."
+msgstr "Werden keine Untertitel über die Plex-Untertitel-Suche gefunden, auf Kodi zurück fallen."

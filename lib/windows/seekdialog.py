@@ -1337,6 +1337,8 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
                 )
 
                 subs_dl_source = button == 0 and 'plex' or 'kodi'
+
+
             if subs_dl_source == 'plex':
                 was_playing = False
                 if self.player.playState == self.player.STATE_PLAYING:
@@ -1346,10 +1348,13 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
                 if downloaded:
                     self.setSubtitles(honor_forced_subtitles_override=False,
                                       honor_deselect_subtitles=False, ref=None)
+                elif downloaded is None:
+                    if util.getSetting('subtitle_download_fallback', True):
+                        subs_dl_source = 'kodi'
                 if was_playing and self.player.playState == self.player.STATE_PAUSED:
                     self.player.pause()
 
-            else:
+            if subs_dl_source == 'kodi':
                 if self.handler and self.handler.player and self.handler.player.playerObject \
                         and util.getSetting('calculate_oshash', False):
                     meta = self.handler.player.playerObject.metadata

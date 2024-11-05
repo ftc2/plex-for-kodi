@@ -2471,3 +2471,11 @@ msgstr ""
 msgctxt "#33700"
 msgid "Download subtitles: {}"
 msgstr ""
+
+msgctxt "#33701"
+msgid "Fallback to Kodi"
+msgstr ""
+
+msgctxt "#33702"
+msgid "When no subtitles are found via the Plex subtitle search, fall back to Kodi subtitle search."
+msgstr ""

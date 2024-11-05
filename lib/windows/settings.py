@@ -547,6 +547,11 @@ class Settings(object):
                         ('kodi', 'Kodi'),
                     )
                 ).description(T(33695, "Where do you want to download subtitles from?")),
+                BoolSetting('subtitle_download_fallback', T(33701, 'Fallback to Kodi'),
+                            True).description(
+                    T(33702, "When no subtitles are found via the Plex subtitle search, fall back to Kodi "
+                             "subtitle search.")
+                ),
                 OptionsSetting(
                     'burn_subtitles',
                     T(32031, 'Burn-in Subtitles'),

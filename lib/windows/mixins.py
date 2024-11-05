@@ -244,15 +244,32 @@ class PlaybackBtnMixin(object):
         self.playBtnClicked = False
 
 
+PLEX_LEGACY_LANGUAGE_MAP = {
+    "pb": ("pt", "pt-BR"),
+}
+
+
 class PlexSubtitleDownloadMixin(object):
     def __init__(self, *args, **kwargs):
         super(PlexSubtitleDownloadMixin, self).__init__()
 
     def downloadPlexSubtitles(self, video):
-        util.DEBUG_LOG("Using language {} for subtitle search", pnUtil.ACCOUNT.subtitlesLanguage)
+        """
 
+        @param video:
+        @return: False if user backed out, None if no subtitles found, or the downloaded subtitle stream
+        """
+        from iso639 import languages
+        lang_code_parse, lang_code = PLEX_LEGACY_LANGUAGE_MAP.get(pnUtil.ACCOUNT.subtitlesLanguage,
+                                                                  (pnUtil.ACCOUNT.subtitlesLanguage,
+                                                                   pnUtil.ACCOUNT.subtitlesLanguage))
+        language = languages.get(part1=lang_code_parse)
+
+        util.DEBUG_LOG("Using language {} for subtitle search", ensure_str(str(language.name)))
+
+        subs = None
         with busy.BusyBlockingContext(delay=True):
-            subs = video.findSubtitles(language=pnUtil.ACCOUNT.subtitlesLanguage,
+            subs = video.findSubtitles(language=lang_code,
                                        hearing_impaired=pnUtil.ACCOUNT.subtitlesSDH,
                                        forced=pnUtil.ACCOUNT.subtitlesForced)
 
@@ -275,7 +292,7 @@ class PlexSubtitleDownloadMixin(object):
                 choice = playersettings.showOptionsDialog(T(33700, "Download subtitles: {}").format(ensure_str(language.name)),
                                                           options, trim=False)
                 if choice is None:
-                    return
+                    return False
 
                 with busy.BusyBlockingContext(delay=True):
                     video.downloadSubtitles(choice)
