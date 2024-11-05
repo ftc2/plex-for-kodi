@@ -58,6 +58,7 @@ class MyPlexAccount(object):
         # defaultSubtitleForced: 0 = prefer non forced, 1 = prefer forced, 2 = only forced, 3 = only non forced
         self.subtitlesSDH = 0
         self.subtitlesForced = 0
+        self.subtitlesLanguage = 'en'
 
     def init(self):
         self.loadState()
@@ -79,6 +80,7 @@ class MyPlexAccount(object):
             'lastHomeUserUpdate': self.lastHomeUserUpdate,
             'subtitlesSDH': self.subtitlesSDH,
             'subtitlesForced': self.subtitlesForced,
+            'subtitlesLanguage': self.subtitlesLanguage,
         }
 
         if self.cacheHomeUsers:
@@ -118,6 +120,7 @@ class MyPlexAccount(object):
                 self.lastHomeUserUpdate = obj.get('lastHomeUserUpdate')
                 self.subtitlesSDH = obj.get('subtitlesSDH', 0)
                 self.subtitlesForced = obj.get('subtitlesForced', 0)
+                self.subtitlesLanguage = obj.get('subtitlesLanguage', 'en')
                 if self.cacheHomeUsers:
                     self.homeUsers = [HomeUser(data) for data in obj.get('homeUsers', [])]
                     self.setAdminByCHU()
@@ -152,6 +155,7 @@ class MyPlexAccount(object):
         util.LOG("AdminPlexPass: {0}", self.adminHasPlexPass)
         util.LOG("subtitlesSDH: {0}", self.subtitlesSDH)
         util.LOG("subtitlesForced: {0}", self.subtitlesForced)
+        util.LOG("subtitlesLanguage: {0}", self.subtitlesLanguage)
 
     def getHomeSubscription(self):
         """
@@ -199,6 +203,7 @@ class MyPlexAccount(object):
             prof = data.find('profile_settings')
             self.subtitlesSDH = int(prof.attrib.get('default_subtitle_accessibility', 0))
             self.subtitlesForced = int(prof.attrib.get('default_subtitle_forced', 0))
+            self.subtitlesLanguage = str(prof.attrib.get('default_subtitle_language', 'en'))
 
             # PIN
             if data.attrib.get('pin'):

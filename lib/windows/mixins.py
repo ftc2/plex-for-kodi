@@ -249,18 +249,11 @@ class PlexSubtitleDownloadMixin(object):
         super(PlexSubtitleDownloadMixin, self).__init__()
 
     def downloadPlexSubtitles(self, video):
-        from iso639 import languages
-        audio = video.selectedAudioStream()
-        language = languages.get(part1="en")
-        if audio:
-            audio_language = languages.get(part2t=audio.languageCode)
-            if audio_language:
-                language = audio_language
-
-        util.DEBUG_LOG("Using language {} for subtitle search", ensure_str(repr(language)))
+        util.DEBUG_LOG("Using language {} for subtitle search", pnUtil.ACCOUNT.subtitlesLanguage)
 
         with busy.BusyBlockingContext(delay=True):
-            subs = video.findSubtitles(language=language.part1, hearing_impaired=pnUtil.ACCOUNT.subtitlesSDH,
+            subs = video.findSubtitles(language=pnUtil.ACCOUNT.subtitlesLanguage,
+                                       hearing_impaired=pnUtil.ACCOUNT.subtitlesSDH,
                                        forced=pnUtil.ACCOUNT.subtitlesForced)
 
         if subs:
