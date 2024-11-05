@@ -1,8 +1,5 @@
 # coding=utf-8
-from kodi_six import xbmcaddon
-
-
-ADDON = xbmcaddon.Addon()
+from .kodi_util import ADDON
 
 
 def T(ID, eng=''):

@@ -1,10 +1,9 @@
 # coding=utf-8
 import threading
+import _strptime
 import datetime
 import binascii
 import json
-
-import plexnet.util
 
 from lib.kodi_util import ADDON
 
@@ -44,21 +43,23 @@ def getSetting(key, default=None):
 
 
 def getUserSetting(key, default=None):
-    if not plexnet.util.ACCOUNT:
+    from plexnet.util import ACCOUNT
+
+    if not ACCOUNT:
         return default
 
     is_json = key in JSON_SETTINGS
 
-    key = '{}.{}'.format(key, plexnet.util.ACCOUNT.ID)
+    key = '{}.{}'.format(key, ACCOUNT.ID)
     with SETTINGS_LOCK:
         setting = ADDON.getSetting(key)
         return _processSetting(setting, default, is_json=is_json)
 
 
-def setSetting(key, value):
+def setSetting(key, value, addon=ADDON):
     with SETTINGS_LOCK:
         value = _processSettingForWrite(value)
-        ADDON.setSetting(key, value)
+        addon.setSetting(key, value)
 
 
 def _processSettingForWrite(value):

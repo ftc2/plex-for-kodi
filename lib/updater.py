@@ -25,20 +25,6 @@ except:
     LANGUAGE_RESOURCE = "resource.language.en_gb"
 
 
-class ServiceMonitor(xbmc.Monitor):
-    def __init__(self, *args, **kwargs):
-        xbmc.Monitor.__init__(self, *args, **kwargs)
-
-        self.sleeping = False
-
-    def onNotification(self, sender, method, data):
-        if sender == "xbmc" and method == "System.OnSleep":
-            self.sleeping = True
-
-        elif sender == "xbmc" and method == "System.OnWake":
-            self.sleeping = False
-
-
 UPDATERS = {}
 
 def register_updater(cls):

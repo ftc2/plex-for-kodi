@@ -1,26 +1,19 @@
 # coding=utf-8
 import os
+import _strptime
 import datetime
 import json
 import traceback
 
 import lib.kodi_util
 # noinspection PyUnresolvedReferences
-from lib.kodi_util import (xbmc, xbmcgui, xbmcaddon, IPCTimeoutException, waitForGPEmpty, ICON_PATH,
-                           setGlobalProperty, getGlobalProperty, KODI_VERSION_MAJOR)
+from lib.kodi_util import xbmc, xbmcgui, xbmcaddon, ICON_PATH, KODI_VERSION_MAJOR
 from lib.settings_util import getSetting, setSetting
+from lib.properties import IPCTimeoutException, waitForGPEmpty, setGlobalProperty, getGlobalProperty
+from lib.updater import get_updater, UpdateException, UpdaterSkipException
+from lib.util import MONITOR
 from lib.i18n import T
 from lib.logging import service_log as log
-
-
-def should_check():
-    return not any([
-        xbmc.Player().isPlaying(),
-        getGlobalProperty('running') != '1',
-        getGlobalProperty('started') != '1',
-        getGlobalProperty('is_active') != '1',
-        getGlobalProperty('waiting_for_start')
-    ])
 
 
 def disable_enable_addon():
@@ -35,10 +28,6 @@ def disable_enable_addon():
 
 
 def update_loop():
-    # update checker and auto update logic
-    from lib.updater import get_updater, ServiceMonitor, UpdateException, UpdaterSkipException
-
-    monitor = ServiceMonitor()
     last_update_check = getSetting('last_update_check', datetime.datetime.fromtimestamp(0))
     check_interval = datetime.timedelta(hours=getSetting('update_interval_hours', 4))
     check_immediate = getSetting('update_check_startup', True)
@@ -47,13 +36,13 @@ def update_loop():
 
     updater = get_updater(mode)(branch=branch if KODI_VERSION_MAJOR > 18 else 'addon_kodi18')
 
-    while not getGlobalProperty('running') and not monitor.abortRequested():
-        if monitor.waitForAbort(1):
-            return
+    while not getGlobalProperty('running') and not MONITOR.abortRequested():
+        if MONITOR.waitForAbort(0.1):
+            break
 
-    log('Checking for updates periodically')
+    log('Checking for updates periodically (last: {})'.format(str(last_update_check)))
 
-    while not monitor.abortRequested():
+    while not MONITOR.abortRequested():
         now = datetime.datetime.now()
 
         # try consuming an update mode change
@@ -65,8 +54,17 @@ def update_loop():
             allow_downgrade = True
             check_immediate = True
 
-        if (last_update_check + check_interval <= now or check_immediate) and not monitor.sleeping:
-            if should_check():
+        if getSetting('last_update_check', datetime.datetime.fromtimestamp(0)) != last_update_check:
+            setSetting('last_update_check', last_update_check)
+
+        if (last_update_check + check_interval <= now or check_immediate) and not MONITOR.device_sleeping:
+            if not any([
+                    xbmc.Player().isPlaying(),
+                    getGlobalProperty('running') != '1',
+                    getGlobalProperty('started') != '1',
+                    getGlobalProperty('is_active') != '1',
+                    getGlobalProperty('waiting_for_start')
+                ]):
                 addon_version = lib.kodi_util.ADDON.getAddonInfo('version')
                 try:
                     pd = None
@@ -81,6 +79,7 @@ def update_loop():
 
                     last_update_check = datetime.datetime.now()
                     setSetting('last_update_check', last_update_check)
+                    setGlobalProperty('last_update_check', last_update_check.strftime('%Y-%m-%dT%H:%M:%S.%f'))
 
                     if update_version:
                         log("Update found: {}".format(update_version))
@@ -135,7 +134,8 @@ def update_loop():
                                 pd.update(75, message="Cleaning up")
                                 updater.cleanup()
                                 pd.update(100, message="Preparing to start")
-                                monitor.waitForAbort(1.0)
+                                if MONITOR.waitForAbort(1.0):
+                                    break
 
                                 do_start = True
                                 if "service" in major_changes or "language" in major_changes:
@@ -208,8 +208,8 @@ def update_loop():
                         pass
 
         # tick every two seconds if home or settings windows are active, otherwise every 10
-        interval = getGlobalProperty('active_window') in ("HomeWindow", "SettingsWindow") and 2 or 10
-        if monitor.waitForAbort(interval):
+        interval = getGlobalProperty('active_window') in ("HomeWindow", "SettingsWindow") and 2.0 or 10.0
+        if MONITOR.waitForAbort(interval):
             break
 
         if not getSetting('auto_update_check', True):

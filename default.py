@@ -6,7 +6,8 @@ import sys
 
 from lib.logging import log
 # noinspection PyUnresolvedReferences
-from lib.kodi_util import translatePath, xbmc, xbmcgui, setGlobalProperty, getGlobalProperty
+from lib.kodi_util import translatePath, xbmc, xbmcgui
+from lib.properties import getGlobalProperty, setGlobalProperty
 from tendo_singleton import SingleInstance, SingleInstanceException
 
 

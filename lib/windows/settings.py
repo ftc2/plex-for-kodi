@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import json
 import sys
 import datetime
+import types
 
 import plexnet
 from kodi_six import xbmc
@@ -329,6 +330,8 @@ class InfoSetting(BasicSetting):
         self.info = info
 
     def valueLabel(self):
+        if isinstance(self.info, types.FunctionType):
+            return self.info()
         return self.info
 
 
@@ -903,11 +906,11 @@ class Settings(object):
                 InfoSetting('userdata_path', T(33617, 'Userdata/Profile Path'),
                             util.translatePath("special://profile")),
                 InfoSetting('service_status', T(33689, 'Service running'),
-                            "{} ({})".format(
+                            lambda: "{} ({})".format(
                                 util.getGlobalProperty("service.started") and T(32328, "Yes") or T(32329, "No"),
                                 util.getGlobalProperty("service.version"))),
                 InfoSetting('i_last_update_check', T(33690, "Last update check"),
-                            util.getSetting('last_update_check', datetime.datetime.fromtimestamp(0)).isoformat()),
+                            lambda: util.getGlobalProperty('last_update_check', datetime.datetime.fromtimestamp(0).strftime('%Y-%m-%dT%H:%M:%S.%f'))),
             )
         ),
     }

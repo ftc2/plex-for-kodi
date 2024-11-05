@@ -33,11 +33,12 @@ from .i18n import T
 from . import aspectratio
 # noinspection PyUnresolvedReferences
 from .kodi_util import (ADDON, xbmc, xbmcvfs, xbmcaddon, xbmcgui, translatePath, KODI_VERSION_MAJOR, KODI_VERSION_MINOR,
-                        KODI_BUILD_NUMBER, FROM_KODI_REPOSITORY, setGlobalProperty, setGlobalBoolProperty,
-                        waitForGPEmpty, waitForConsumption, getGlobalProperty)
+                        KODI_BUILD_NUMBER, FROM_KODI_REPOSITORY)
+from .properties import setGlobalProperty, setGlobalBoolProperty, waitForGPEmpty, waitForConsumption, getGlobalProperty
 # noinspection PyUnresolvedReferences
 from .settings_util import getSetting, getUserSetting, setSetting, USER_SETTINGS, JSON_SETTINGS
-from plexnet import signalsmixin
+from .monitor import MONITOR
+
 
 DEBUG = True
 _SHUTDOWN = False
@@ -209,105 +210,6 @@ def ERROR(txt='', hide_tb=False, notify=False, time_ms=3000):
 
 def TEST(msg):
     xbmc.log('---TEST: {0}'.format(msg), xbmc.LOGINFO)
-
-
-class UtilityMonitor(xbmc.Monitor, signalsmixin.SignalsMixin):
-    def __init__(self, *args, **kwargs):
-        xbmc.Monitor.__init__(self, *args, **kwargs)
-        signalsmixin.SignalsMixin.__init__(self)
-
-    def watchStatusChanged(self):
-        self.trigger('changed.watchstatus')
-
-    def actionStop(self):
-        self.stopPlayback()
-
-    def actionQuit(self):
-        LOG('OnSleep: Exit Kodi')
-        xbmc.executebuiltin('Quit')
-
-    def actionReboot(self):
-        LOG('OnSleep: Reboot')
-        xbmc.restart()
-
-    def actionShutdown(self):
-        LOG('OnSleep: Shutdown')
-        xbmc.shutdown()
-
-    def actionHibernate(self):
-        LOG('OnSleep: Hibernate')
-        xbmc.executebuiltin('Hibernate')
-
-    def actionSuspend(self):
-        LOG('OnSleep: Suspend')
-        xbmc.executebuiltin('Suspend')
-
-    def actionCecstandby(self):
-        LOG('OnSleep: CEC Standby')
-        xbmc.executebuiltin('CECStandby')
-
-    def actionLogoff(self):
-        LOG('OnSleep: Sign Out')
-        xbmc.executebuiltin('System.LogOff')
-
-    def onNotification(self, sender, method, data):
-        LOG("Notification: {} {} {}".format(sender, method, data))
-        if sender == 'script.plexmod' and method.endswith('RESTORE'):
-            from .windows import kodigui, windowutils
-
-            def exit_mainloop():
-                LOG("Addon never properly started, can't reactivate")
-                windowutils.HOME.doClose()
-
-            if not kodigui.BaseFunctions.lastWinID:
-                exit_mainloop()
-                return
-            if kodigui.BaseFunctions.lastWinID > 13000:
-                reInitAddon()
-                setGlobalProperty('is_active', '1')
-                xbmc.executebuiltin('ActivateWindow({0})'.format(kodigui.BaseFunctions.lastWinID))
-            else:
-                exit_mainloop()
-                return
-
-        elif sender == "xbmc" and method == "System.OnSleep":
-            if getSetting('action_on_sleep', "none") != "none":
-                getattr(self, "action{}".format(getSetting('action_on_sleep', "none").capitalize()))()
-            self.trigger('system.sleep')
-
-        elif sender == "xbmc" and method == "System.OnWake":
-            self.trigger('system.wakeup')
-
-    def stopPlayback(self):
-        LOG('Monitor: Stopping media playback')
-        xbmc.Player().stop()
-
-    def onScreensaverActivated(self):
-        DEBUG_LOG("Monitor: OnScreensaverActivated")
-        self.trigger('screensaver.activated')
-        if getSetting('player_stop_on_screensaver', False) and xbmc.Player().isPlayingVideo():
-            self.stopPlayback()
-
-    def onScreensaverDeactivated(self):
-        DEBUG_LOG("Monitor: OnScreensaverDeactivated")
-        self.trigger('screensaver.deactivated')
-
-    def onDPMSActivated(self):
-        DEBUG_LOG("Monitor: OnDPMSActivated")
-        self.trigger('dpms.activated')
-        #self.stopPlayback()
-
-    def onDPMSDeactivated(self):
-        DEBUG_LOG("Monitor: OnDPMSDeactivated")
-        self.trigger('dpms.deactivated')
-        #self.stopPlayback()
-
-    def onSettingsChanged(self):
-        """ unused stub, but works if needed """
-        pass
-
-
-MONITOR = UtilityMonitor()
 
 
 hasCustomBGColour = False

@@ -10,7 +10,7 @@ from lib import util
 
 
 
-ADDON = xbmcaddon.Addon()
+ADDON = util.ADDON
 
 
 ATTR_MAP = {
