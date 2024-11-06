@@ -3035,17 +3035,44 @@ msgid "Ask"
 msgstr "Fragen"
 
 msgctxt "#33695"
-msgid "Where do you want to download subtitles from?"
-msgstr "Woher möchtest du Untertitel herunterladen?"
+msgid "Where do you want to download subtitles from? Note: Currently this only applies to the subtitle quick actions in the player. The subtitle download in stream settings always uses Plex as a source."
+msgstr "Woher möchtest du Untertitel herunterladen? Achtung: Das gilt aktuell nur für die Untertitel-Schnellaktionen im Player. Die Untertitel-Download Funktion in den Stream-Einstellungen benutzt immer Plex als Quelle."
 
 msgctxt "#33696"
 msgid "No subtitles found."
 msgstr "Keine Untertitel gefunden."
+
+#: things in curly brackets are variables, don't translate them!
+msgctxt "#33697"
+msgid "{provider_title}, Score: {subtitle_score}{subtitle_info}"
+msgstr "{provider_title}, Punktzahl: {subtitle_score}{subtitle_info}"
+
+#: hearing impaired subtitle flag
+msgctxt "#33698"
+msgid "HI"
+msgstr "HI"
+
+#: forced subtitle flag
+msgctxt "#33699"
+msgid "forced"
+msgstr "erzwungen"
+
+msgctxt "#33700"
+msgid "Download subtitles: {}"
+msgstr "Untertitel herunterladen: {}"
 
 msgctxt "#33701"
 msgid "Fallback to Kodi"
 msgstr "Falle auf Kodi zurück"
 
 msgctxt "#33702"
-msgid "When no subtitles are found via the Plex subtitle search, fall back to Kodi subtitle search."
-msgstr "Werden keine Untertitel über die Plex-Untertitel-Suche gefunden, auf Kodi zurück fallen."
+msgid "When no subtitles are found via the Plex subtitle search, fall back to Kodi subtitle search. Note: Currently this only applies to the subtitle quick actions in the player. The subtitle download in stream settings always uses Plex as a source."
+msgstr "Werden keine Untertitel über die Plex-Untertitel-Suche gefunden, auf Kodi zurück fallen. Achtung: Das gilt aktuell nur für die Untertitel-Schnellaktionen im Player. Die Untertitel-Download Funktion in den Stream-Einstellungen benutzt immer Plex als Quelle."
+
+msgctxt "#33703"
+msgid "Download subtitles"
+msgstr "Untertitel herunterladen"
+
+msgctxt "#33704"
+msgid "Using which service?"
+msgstr "Mit welchem Service?"

@@ -546,11 +546,14 @@ class Settings(object):
                         ('plex', 'Plex'),
                         ('kodi', 'Kodi'),
                     )
-                ).description(T(33695, "Where do you want to download subtitles from?")),
+                ).description(T(33695, "Where do you want to download subtitles from? Note: Currently this "
+                                       "only applies to the subtitle quick actions in the player. The subtitle download"
+                                       " in stream settings always uses Plex as a source.")),
                 BoolSetting('subtitle_download_fallback', T(33701, 'Fallback to Kodi'),
                             True).description(
                     T(33702, "When no subtitles are found via the Plex subtitle search, fall back to Kodi "
-                             "subtitle search.")
+                             "subtitle search. Note: Currently this only applies to the subtitle quick actions in the "
+                             "player. The subtitle download in stream settings always uses Plex as a source.")
                 ),
                 OptionsSetting(
                     'burn_subtitles',

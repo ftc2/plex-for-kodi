@@ -8,9 +8,10 @@ from lib import metadata
 from lib import util
 from lib.util import T
 from . import kodigui
+from . import mixins
 
 
-class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
+class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver, mixins.PlexSubtitleDownloadMixin):
     xmlFile = 'script-plex-video_settings_dialog.xml'
     path = util.ADDON.getAddonInfo('path')
     theme = 'Main'
@@ -22,6 +23,7 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
 
     def __init__(self, *args, **kwargs):
         kodigui.BaseDialog.__init__(self, *args, **kwargs)
+        mixins.PlexSubtitleDownloadMixin.__init__(self, *args, **kwargs)
         self.video = kwargs.get('video')
         self.viaOSD = kwargs.get('via_osd')
         self.nonPlayback = kwargs.get('non_playback')
@@ -107,7 +109,8 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
         options = [
             ('audio', T(32395, 'Audio'), audio),
             ('subs', T(32396, 'Subtitles'), subtitle),
-            ('quality', T(32397, 'Quality'), u'{0}'.format(current))
+            ('quality', T(32397, 'Quality'), u'{0}'.format(current)),
+            ('download_subs', T(33703, "Download subtitles"), ''),
         ]
 
         if not self.nonPlayback:
@@ -189,6 +192,11 @@ class VideoSettingsDialog(kodigui.BaseDialog, util.CronReceiver):
             showAudioDialog(self.video, non_playback=self.nonPlayback)
         elif result == 'subs':
             showSubtitlesDialog(self.video, non_playback=self.nonPlayback)
+        elif result == 'download_subs':
+            downloaded = self.downloadPlexSubtitles(self.video, non_playback=self.nonPlayback)
+            if downloaded:
+                self.video.selectStream(downloaded, from_session=not self.nonPlayback, sync_to_server=False)
+                self.video.manually_selected_sub_stream = downloaded.id
         elif result == 'quality':
             idx = None
             override = self.qualityOverride

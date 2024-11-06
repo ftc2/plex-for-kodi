@@ -1331,7 +1331,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
             if subs_dl_source == 'ask':
                 button = optionsdialog.show(
                     T(33693, 'Download subtitles using'),
-                    T(33695, 'Where do you want to download subtitles from?'),
+                    T(33704, 'Using which service?'),
                     'Plex',
                     'Kodi'
                 )
