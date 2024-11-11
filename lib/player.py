@@ -473,9 +473,9 @@ class SeekPlayerHandler(BasePlayerHandler):
                 if currIdx != self.player.video._current_subtitle_idx + self.subtitleStreamOffset:
                     util.LOG("Embedded Subtitle index was incorrect ({}), setting to: {}".
                              format(currIdx, self.player.video._current_subtitle_idx + self.subtitleStreamOffset))
+                    self.dialog.setSubtitles()
                 else:
                     util.DEBUG_LOG("Embedded subtitle was correctly set in Kodi")
-                self.dialog.setSubtitles()
             except:
                 util.ERROR("Exception when trying to check for embedded subtitles")
 
