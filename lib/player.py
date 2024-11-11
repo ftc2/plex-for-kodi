@@ -854,6 +854,10 @@ class SeekPlayerHandler(BasePlayerHandler):
                 and not self.queuingNext and not self.stoppedManually and self.player.isPlayingVideo() and
                 self.player.playState != self.player.STATE_STOPPED):
             self.updateNowPlaying()
+        else:
+            util.DEBUG_LOG("Not ticking UpdateNowPlaying: {}, {}, {}, {}, {}, {}, {}, {}", self.seeking,
+                           self.ended, self.player.started, self.seekOnStart, self.queuingNext, self.stoppedManually,
+                           self.player.isPlayingVideo(), self.player.playState)
 
         if self.dialog and getattr(self.dialog, "_ignoreTick", None) is not True:
             self.dialog.tick()
