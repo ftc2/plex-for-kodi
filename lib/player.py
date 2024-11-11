@@ -433,7 +433,10 @@ class SeekPlayerHandler(BasePlayerHandler):
             # Some devices seem to have an issue with the self.player.seekTime function where after the seek the video
             # will be playing, but the audio won't for a few seconds(I've seen up to 15 seconds).  Using this alternate
             # way to seek avoids that issue.
-            if self.useAlternateSeek:
+
+            # we only apply the fix for a significant seek, otherwise the event might not fire, and we end up with
+            # an unconsumed self.seekOnStart, which leads to never sending timeline events
+            if self.useAlternateSeek and seekSeconds > 0.5:
                 currentTime = self.player.getTime()
                 relativeSeekSeconds = seekSeconds - currentTime
                 util.DEBUG_LOG("SeekAbsolute: Seeking to offset: {0}, current time: {1}, relative seek: {2}".format(
@@ -617,14 +620,14 @@ class SeekPlayerHandler(BasePlayerHandler):
                 tries += 1
 
             if self.player.getTime() * 1000 < withinSOS:
-                if self.useResumeFix:
+                if self.useResumeFix and self.seekOnStart > 500:
                     self.waitingForSOS = True
                     # checking infoLabel Player.Seeking would be the better solution here, but we're dealing with stuff like
                     # CoreELEC, which doesn't necessarily properly honor this
                     util.MONITOR.waitForAbort(0.25)
                 self.seek(self.seekOnStart)
 
-                if self.useResumeFix:
+                if self.useResumeFix and self.seekOnStart > 500:
                     util.MONITOR.waitForAbort(util.addonSettings.coreelecResumeSeekWait / 1000.0)
 
                     util.DEBUG_LOG("OnPlayBackSeek: SeekOnStart: "
