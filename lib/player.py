@@ -684,6 +684,9 @@ class SeekPlayerHandler(BasePlayerHandler):
                 ess = None
                 ext_subs_amount = 0
                 for ss in self.player.video.subtitleStreams:
+                    if not ss.languageCode:
+                        util.DEBUG_LOG("Skipping subtitle: {}, no language code found".format(ss))
+                        continue
                     if not ess and ss.embedded:
                         ess = ss
                     # ss.score: only downloaded external subtitles have a score; skip them, as they're not visible to
