@@ -18,7 +18,7 @@ from . import plex
 
 from plexnet import plexapp
 from .templating import render_templates
-from .windows import background, userselect, home, windowutils, kodigui
+from .windows import background, userselect, home, windowutils, kodigui, busy
 from . import player
 from . import backgroundthread
 from . import util
@@ -187,8 +187,20 @@ def _main():
                             signout()
                             break
                         elif closeOption == 'switch':
+                            # store last user ID
+                            util.DEBUG_LOG('Main: Switching users...: {}', plexapp.ACCOUNT.ID)
+                            util.setSetting('previous_user', plexapp.ACCOUNT.ID)
                             plexapp.ACCOUNT.isAuthenticated = False
                             fromSwitch = True
+                        elif isinstance(closeOption, dict):
+                            if closeOption.get('fast_switch'):
+                                uid = closeOption['fast_switch']
+                                util.DEBUG_LOG('Main: Fast-Switching users...: {}', uid)
+                                util.setSetting('previous_user', plexapp.ACCOUNT.ID)
+                                with busy.BusySignalContext(plexapp.util.APP, "account:response"):
+                                    if plexapp.ACCOUNT.switchHomeUser(uid) and plexapp.ACCOUNT.switchUser:
+                                        util.DEBUG_LOG('Waiting for user change...')
+
                         elif closeOption == 'recompile':
                             render_templates(force=True)
                             util.LOG("Restarting Home")

@@ -388,6 +388,13 @@ class MyPlexAccount(object):
         self.lastHomeUserUpdate = time.time()
         self.saveState()
 
+    def getHomeUser(self, userId):
+        if not self.homeUsers:
+            return None
+        for user in self.homeUsers:
+            if user.id == userId:
+                return user
+
     def switchHomeUser(self, userId, pin=''):
         if userId == self.ID and self.isAuthenticated:
             return True

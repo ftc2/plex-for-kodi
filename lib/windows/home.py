@@ -864,6 +864,12 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                 if action == xbmcgui.ACTION_SELECT_ITEM:
                     self.showServers()
                     return
+                elif action == xbmcgui.ACTION_CONTEXT_MENU and util.getUserSetting('previous_server', None):
+                    uuid = util.getUserSetting('previous_server', None)
+                    if uuid != plexapp.SERVERMANAGER.selectedServer.uuid:
+                        self.selectServer(uuid)
+                    return
+
                 elif action == xbmcgui.ACTION_MOUSE_LEFT_CLICK:
                     self.showServers(mouse=True)
                     self.setBoolProperty('show.servers', True)
@@ -871,6 +877,20 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             elif controlID == self.USER_BUTTON_ID:
                 if action == xbmcgui.ACTION_SELECT_ITEM:
                     self.showUserMenu()
+                    return
+                elif action == xbmcgui.ACTION_CONTEXT_MENU and util.getSetting('previous_user', None):
+                    # check whether we can fast swap (account is not protected)
+                    # get user
+                    uid = util.getSetting('previous_user', None)
+                    if uid == plexapp.ACCOUNT.ID:
+                        return
+
+                    user = plexapp.ACCOUNT.getHomeUser(uid)
+                    if not user or user.isProtected:
+                        self.doUserOption(force_option="switch")
+                        return
+
+                    self.doUserOption(force_option={"fast_switch": user.id})
                     return
                 elif action == xbmcgui.ACTION_MOUSE_LEFT_CLICK:
                     self.showUserMenu(mouse=True)
@@ -2402,21 +2422,28 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             if not from_refresh:
                 plexapp.refreshResources()
 
-    def selectServer(self):
+    def selectServer(self, uuid=None):
         if self._shuttingDown:
             return
 
-        mli = self.serverList.getSelectedItem()
-        if not mli:
-            return
+        if not uuid:
+            mli = self.serverList.getSelectedItem()
+            if not mli:
+                return
+            server = mli.dataSource
+        else:
+            server = plexapp.SERVERMANAGER.getServer(uuid)
+            if not server:
+                return
+
+        # store last used server
+        util.setSetting('previous_server.{}'.format(plexapp.ACCOUNT.ID), plexapp.SERVERMANAGER.selectedServer.uuid)
 
         self.changingServer = True
 
         # this is broken
         with busy.BusySignalContext(plexapp.util.APP, "change:selectedServer") as bc:
             self.setFocusId(self.SECTION_LIST_ID)
-
-            server = mli.dataSource
 
             # fixme: this might still trigger a dialog, re-triggering the previously opened windows
             if not self._shuttingDown and not server.isReachable():
@@ -2469,12 +2496,15 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         if not mouse:
             self.setFocusId(self.USER_LIST_ID)
 
-    def doUserOption(self):
-        mli = self.userList.getSelectedItem()
-        if not mli:
-            return
+    def doUserOption(self, force_option=None):
+        if not force_option:
+            mli = self.userList.getSelectedItem()
+            if not mli:
+                return
 
-        option = mli.dataSource
+            option = mli.dataSource
+        else:
+            option = force_option
 
         self.setFocusId(self.USER_BUTTON_ID)
 
