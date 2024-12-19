@@ -505,13 +505,19 @@ class SeekPlayerHandler(BasePlayerHandler):
             util.CRON.forceTick()
         # self.hideOSD()
 
+    def getVideoPlayedFac(self, ref=None):
+        return (ref if ref is not None else self.trueTime * 1000) / float(self.duration)
+
     @property
     def videoPlayedFac(self):
-        return self.trueTime * 1000 / float(self.duration)
+        return self.getVideoPlayedFac()
+
+    def getVideoWatched(self, ref=None):
+        return self.getVideoPlayedFac(ref=ref) >= self.playedThreshold or self.player.isExternal
 
     @property
     def videoWatched(self):
-        return self.videoPlayedFac >= self.playedThreshold or self.player.isExternal
+        return self.getVideoWatched()
 
     def triggerProgressEvent(self):
         if not self.player.video:
@@ -528,7 +534,8 @@ class SeekPlayerHandler(BasePlayerHandler):
             prk = self.player.video.parentRatingKey
             gprk = self.player.video.grandparentRatingKey
 
-        self.player.trigger('video.progress', data=(gprk, prk, rk, self._progressHld[rk] if not self.videoWatched else True))
+        self.player.trigger('video.progress', data=(gprk, prk, rk, self._progressHld[rk] if not self.getVideoWatched(
+            ref=self._progressHld[rk] if self._progressHld[rk] > self.trueTime * 1000 else None) else True))
         self._progressHld = {}
 
     def onPlayBackStopped(self):
