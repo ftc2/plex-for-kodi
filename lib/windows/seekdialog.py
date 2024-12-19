@@ -831,7 +831,15 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
                                 if not self.playlistDialogVisible:
                                     self.hideOSD()
                             else:
-                                self.sendTimeline(state=self.player.STATE_STOPPED, ensureFinalTimelineEvent=True)
+                                # were we in a credits marker that has been canceled? use its endTime for our timeline
+                                # event
+                                t = None
+                                if (self._currentMarker and self._currentMarker["marker_type"] == "credits" and
+                                        self._currentMarker["hidden"]):
+                                    util.DEBUG_LOG("Using credits marker's endtime for timeline event as it's been "
+                                                   "skipped and we're stopping playback")
+                                    t = self._currentMarker["marker"].endTimeOffset
+                                self.sendTimeline(state=self.player.STATE_STOPPED, t=t, ensureFinalTimelineEvent=True)
                                 self.stop()
                             return
         except:
