@@ -456,7 +456,7 @@ class VideoPlayerWindow(kodigui.ControlledWindow, windowutils.UtilMixin, Spoiler
 
         util.DEBUG_LOG('PostPlay: Showing video info')
         if self.next:
-            self.next.reload(includeExtras=1, includeExtrasCount=10)
+            self.next.reload(includeChapters=1, includeExtras=1, includeExtrasCount=10)
 
         self.relatedPaginator = RelatedPaginator(self.relatedListControl,
                                                  leaf_count=int((self.prev or self.next).relatedCount),
