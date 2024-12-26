@@ -1239,7 +1239,7 @@ msgid "Disabled"
 msgstr ""
 
 msgctxt "#33509"
-msgid "Early intro skip threshold (default: < 60s/1m)"
+msgid "Early intro skip threshold (default: < 120s/2m)"
 msgstr ""
 
 msgctxt "#33510"

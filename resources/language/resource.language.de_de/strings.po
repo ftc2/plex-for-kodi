@@ -1524,8 +1524,8 @@ msgstr "Deaktiviert"
 
 #: 
 msgctxt "#33509"
-msgid "Early intro skip threshold (default: < 60s/1m)"
-msgstr "Grenzwert für 'Früher Intro überspringen' (Standardwert < 60s)"
+msgid "Early intro skip threshold (default: < 120s/2m)"
+msgstr "Grenzwert für 'Früher Intro überspringen' (Standardwert < 120s)"
 
 #: 
 msgctxt "#33510"

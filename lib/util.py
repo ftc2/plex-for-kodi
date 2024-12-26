@@ -134,7 +134,7 @@ class AddonSettings(object):
         ("show_media_ends_info", True),
         ("show_media_ends_label", True),
         ("background_colour", None),
-        ("skip_intro_button_show_early_threshold1", 70),
+        ("skip_intro_button_show_early_threshold2", 120),
         ("requests_timeout_connect", 5.0),
         ("requests_timeout_read", 10.0),
         ("plextv_timeout_connect", 1.0),

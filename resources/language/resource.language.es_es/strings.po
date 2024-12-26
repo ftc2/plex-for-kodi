@@ -1515,8 +1515,8 @@ msgstr "Desactivado"
 
 #: 
 msgctxt "#33509"
-msgid "Early intro skip threshold (default: < 60s/1m)"
-msgstr "Umbral de salto de introducción temprana (por defecto: < 60s/1m)"
+msgid "Early intro skip threshold (default: < 120s/2m)"
+msgstr "Umbral de salto de introducción temprana (por defecto: < 120s/2m)"
 
 #: 
 msgctxt "#33510"

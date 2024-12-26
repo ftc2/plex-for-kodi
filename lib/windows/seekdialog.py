@@ -378,7 +378,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
 
                 # show intro skip early? (only if intro is during the first X minutes)
                 if self.showIntroSkipEarly and markerDef["marker_type"] == "intro" and \
-                        startTimeOffset <= util.addonSettings.skipIntroButtonShowEarlyThreshold1 * 1000:
+                        startTimeOffset <= util.addonSettings.skipIntroButtonShowEarlyThreshold2 * 1000:
                     startTimeOffset = 0
                     markerDef["overrideStartOff"] = 0
 
