@@ -625,6 +625,7 @@ class Settings(object):
                         ('in_progress', T(33011, '')),
                         ('no_unwatched_episode_titles', T(33012, '')),
                         ('blur_chapters', T(33081, '')),
+                        ('hide_ratings', T(33705, '')),
                     )
                 ).description(T(33007, "")),
                 MultiOptionsSetting(

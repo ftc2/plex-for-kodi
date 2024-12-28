@@ -2487,3 +2487,7 @@ msgstr ""
 msgctxt "#33704"
 msgid "Using which service?"
 msgstr ""
+
+msgctxt "#33705"
+msgid "Hide ratings"
+msgstr ""

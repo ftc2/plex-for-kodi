@@ -118,7 +118,7 @@ class DeleteMediaMixin(object):
 
 
 class RatingsMixin(object):
-    def populateRatings(self, video, ref):
+    def populateRatings(self, video, ref, hide_ratings=False):
         def sanitize(src):
             return src.replace("themoviedb", "tmdb").replace('://', '/')
 
@@ -128,6 +128,9 @@ class RatingsMixin(object):
         if video.userRating:
             stars = str(int(round((video.userRating.asFloat() / 10) * 5)))
             setProperty('rating.stars', stars)
+
+        if hide_ratings:
+            return
 
         audienceRating = video.audienceRating
 
@@ -156,12 +159,14 @@ class SpoilersMixin(object):
         self._noSpoilers = None
         self.spoilerSetting = ["unwatched"]
         self.noTitles = False
+        self.noRatings = False
         self.spoilersAllowedFor = True
         self.cacheSpoilerSettings()
 
     def cacheSpoilerSettings(self):
         self.spoilerSetting = util.getSetting('no_episode_spoilers3', ["unwatched"])
         self.noTitles = 'no_unwatched_episode_titles' in self.spoilerSetting
+        self.noRatings = 'hide_ratings' in self.spoilerSetting
         self.spoilersAllowedFor = util.getSetting('spoilers_allowed_genres2', ["Reality", "Game Show", "Documentary",
                                                                                "Sport"])
 

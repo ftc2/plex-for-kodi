@@ -3076,3 +3076,7 @@ msgstr "Untertitel herunterladen"
 msgctxt "#33704"
 msgid "Using which service?"
 msgstr "Mit welchem Service?"
+
+msgctxt "#33705"
+msgid "Hide ratings"
+msgstr "Bewertungen verstecken"

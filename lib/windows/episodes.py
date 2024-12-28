@@ -1309,8 +1309,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
         mli.setProperty('year', video.year)
         mli.setProperty('content.rating', video.contentRating.split('/', 1)[-1])
         mli.setProperty('genre', self.genre)
-
-        self.populateRatings(video, mli)
+        self.populateRatings(video, mli, hide_ratings=self.hideSpoilers(video) and self.noRatings)
 
     def setPostReloadItemInfo(self, video, mli):
         self.setItemAudioAndSubtitleInfo(video, mli)
