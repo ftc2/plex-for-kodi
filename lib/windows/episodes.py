@@ -1235,6 +1235,8 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
             item.setProperty('progress', util.getProgressImage(item.dataSource))
             (self.season or self.show_).reload()
 
+            if self.noRatings:
+                self.populateRatings(item.dataSource, item, hide_ratings=self.hideSpoilers(item.dataSource))
             self.setUserItemInfo(item)
         else:
             self.fillEpisodes(update=True)
