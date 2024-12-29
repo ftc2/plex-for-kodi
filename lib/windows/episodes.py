@@ -492,32 +492,36 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
 
                     # progress can be False (no entry), a number (progress), or True (fully watched just now)
                     # select it if it's not watched or in progress
-                    if progress is True:
-                        # ep was just watched
-                        just_fully_watched = True
-                        mli.setProperty('unwatched', '')
-                        mli.setProperty('watched', '1')
-                        mli.setProperty('progress', '')
-                        mli.setProperty('unwatched.count', '')
-                        mli.setProperty('unwatched.count.large', '')
-                        mli.dataSource.set('viewCount', mli.dataSource.get('viewCount', 0).asInt() + 1)
-                        mli.dataSource.set('viewOffset', 0)
-                        self.setUserItemInfo(mli, fully_watched=True)
+                    if progress:
+                        if progress is True:
+                            # ep was just watched
+                            just_fully_watched = True
+                            mli.setProperty('unwatched', '')
+                            mli.setProperty('watched', '1')
+                            mli.setProperty('progress', '')
+                            mli.setProperty('unwatched.count', '')
+                            mli.setProperty('unwatched.count.large', '')
+                            mli.dataSource.set('viewCount', mli.dataSource.get('viewCount', 0).asInt() + 1)
+                            mli.dataSource.set('viewOffset', 0)
+                            self.setUserItemInfo(mli, fully_watched=True)
 
-                    elif progress and progress > 60000:
-                        # ep has progress
-                        mli.setProperty('watched', '')
-                        mli.setProperty('progress', util.getProgressImage(mli.dataSource, view_offset=progress))
-                        mli.dataSource.set('viewOffset', progress)
-                        self.setUserItemInfo(mli, watched=True)
-                        set_main_progress_to = progress
+                        elif progress > 60000:
+                            # ep has progress
+                            mli.setProperty('watched', '')
+                            mli.setProperty('progress', util.getProgressImage(mli.dataSource, view_offset=progress))
+                            mli.dataSource.set('viewOffset', progress)
+                            self.setUserItemInfo(mli, watched=True)
+                            set_main_progress_to = progress
 
-                    elif progress and progress <= 60000:
-                        # reset progress as we might've had progress before
-                        mli.setProperty('progress', '')
-                        mli.dataSource.set('viewOffset', '')
-                        self.setUserItemInfo(mli)
-                        set_main_progress_to = 0
+                        elif progress <= 60000:
+                            # reset progress as we might've had progress before
+                            mli.setProperty('progress', '')
+                            mli.dataSource.set('viewOffset', '')
+                            self.setUserItemInfo(mli)
+                            set_main_progress_to = 0
+
+                        if self.noRatings:
+                            self.populateRatings(mli.dataSource, mli, hide_ratings=self.hideSpoilers(mli.dataSource))
 
                     # after immediately updating the watched state, if we still have data left, continue
                     if progress is True and progress_data_left:
