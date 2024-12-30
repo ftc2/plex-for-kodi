@@ -2503,3 +2503,7 @@ msgstr ""
 msgctxt "#33708"
 msgid "Hide summaries"
 msgstr ""
+
+msgctxt "#33709"
+msgid "Show ratings for"
+msgstr ""

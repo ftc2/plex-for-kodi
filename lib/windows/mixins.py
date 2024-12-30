@@ -132,6 +132,13 @@ class RatingsMixin(object):
         if hide_ratings:
             return
 
+        if video.TYPE == "movie" and "movies" not in util.getSetting("show_ratings", ["series", "movies"]):
+            return
+
+        if ((video.TYPE in ("episode", "show", "season")) and
+                "series" not in util.getSetting("show_ratings", ["series", "movies"])):
+            return
+
         audienceRating = video.audienceRating
 
         if video.rating or audienceRating:

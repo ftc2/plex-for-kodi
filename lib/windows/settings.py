@@ -618,6 +618,14 @@ class Settings(object):
                     T(33078, "")
                 ),
                 MultiOptionsSetting(
+                    'show_ratings', T(33709, 'Show ratings for'),
+                    ["series", "movies"],
+                    [
+                        ('series', T(32393, 'TV Shows')),
+                        ('movies', T(32348, 'Movies')),
+                    ]
+                ),
+                MultiOptionsSetting(
                     'no_episode_spoilers4', T(33006, ''),
                     ['unwatched', 'blur_images', 'hide_summary'],
                     (

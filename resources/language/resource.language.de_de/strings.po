@@ -3092,3 +3092,7 @@ msgstr "Bilder auf Home verschleiern (fortsetzen)"
 msgctxt "#33708"
 msgid "Hide summaries"
 msgstr "Zusammenfassungen verstecken"
+
+msgctxt "#33709"
+msgid "Show ratings for"
+msgstr "Bewertungen anzeigen für"
