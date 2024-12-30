@@ -2284,8 +2284,8 @@ msgstr "Keine TV-Spoiler"
 
 #: 
 msgctxt "#33007"
-msgid "Select in which cases to blur TV episode thumbnails, previews, redact summaries, hide episode titles and whether to blur chapter images. When the Addon Setting \"Use episode thumbnails in continue hub\" is enabled, blur them as well."
-msgstr "Wähle aus, in welchen Fällen Vorschaubilder von TV-Episoden verschleiert, Zusammenfassungen zensiert, Episodentitel versteckt und Kapitelbilder verschleiert werden sollen. Wenn die Addon-Einstellung \"Vorschaubild für Episoden im Fortsetzen-Hub verwenden\" aktiviert ist, diese ebenfalls verschleiern."
+msgid "Select in which cases to blur TV episode thumbnails, previews, redact summaries, hide episode titles etc."
+msgstr "Wähle aus, in welchen Fällen Vorschaubilder von TV-Episoden verschleiert, Zusammenfassungen zensiert, Episodentitel versteckt usw. werden sollen."
 
 #: 
 msgctxt "#33008"
@@ -3080,3 +3080,15 @@ msgstr "Mit welchem Service?"
 msgctxt "#33705"
 msgid "Hide ratings"
 msgstr "Bewertungen verstecken"
+
+msgctxt "#33706"
+msgid "Blur images"
+msgstr "Bilder verschleiern"
+
+msgctxt "#33707"
+msgid "Blur images on home (in progress)"
+msgstr "Bilder auf Home verschleiern (fortsetzen)"
+
+msgctxt "#33708"
+msgid "Hide summaries"
+msgstr "Zusammenfassungen verstecken"

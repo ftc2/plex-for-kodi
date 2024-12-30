@@ -191,7 +191,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
         self._ignoreInput = False
         self._ignoreTick = False
         self._abortBufferWait = False
-        self.no_spoilers = util.getSetting('no_episode_spoilers3', ["unwatched"])
+        self.no_spoilers = util.getSetting('no_episode_spoilers4', ['unwatched', 'blur_images', 'hide_summary'])
         self.no_time_no_osd_spoilers = util.getSetting('no_osd_time_spoilers', False)
         self.clientLikePlex = util.getSetting('player_official', True)
 

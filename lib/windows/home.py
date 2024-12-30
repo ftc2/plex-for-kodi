@@ -687,7 +687,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         plexapp.util.APP.on('account:response', self.displayServerAndUser)
         plexapp.util.APP.on('sli:reachability:received', self.displayServerAndUser)
         plexapp.util.APP.on('change:hubs_bifurcation_lines', self.updateProperties)
-        plexapp.util.APP.on('change:no_episode_spoilers3', self.setDirty)
+        plexapp.util.APP.on('change:no_episode_spoilers4', self.setDirty)
         plexapp.util.APP.on('change:spoilers_allowed_genres2', self.setDirty)
         plexapp.util.APP.on('change:hubs_use_new_continue_watching', self.setDirty)
         plexapp.util.APP.on('change:path_mapping_indicators', self.setDirty)
@@ -715,7 +715,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         plexapp.util.APP.off('account:response', self.displayServerAndUser)
         plexapp.util.APP.off('sli:reachability:received', self.displayServerAndUser)
         plexapp.util.APP.off('change:hubs_bifurcation_lines', self.updateProperties)
-        plexapp.util.APP.off('change:no_episode_spoilers3', self.setDirty)
+        plexapp.util.APP.off('change:no_episode_spoilers4', self.setDirty)
         plexapp.util.APP.off('change:spoilers_allowed_genres2', self.setDirty)
         plexapp.util.APP.off('change:hubs_use_new_continue_watching', self.setDirty)
         plexapp.util.APP.off('change:path_mapping_indicators', self.setDirty)
@@ -2234,7 +2234,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                 # use episode thumbnail for in progress episodes
                 if mli.dataSource.type == 'episode' and util.addonSettings.continueUseThumb and check_spoilers:
                     # blur them if we don't want any spoilers and the episode hasn't been fully watched
-                    if mli.dataSource._noSpoilers:
+                    if self.noResumeImages and mli.dataSource._noSpoilers:
                         extra_opts = {"blur": util.addonSettings.episodeNoSpoilerBlur}
                     thumb = mli.dataSource.thumb
 

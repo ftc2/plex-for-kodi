@@ -618,13 +618,16 @@ class Settings(object):
                     T(33078, "")
                 ),
                 MultiOptionsSetting(
-                    'no_episode_spoilers3', T(33006, ''),
-                    ['unwatched'],
+                    'no_episode_spoilers4', T(33006, ''),
+                    ['unwatched', 'blur_images', 'hide_summary'],
                     (
                         ('unwatched', T(33010, '')),
                         ('in_progress', T(33011, '')),
                         ('no_unwatched_episode_titles', T(33012, '')),
+                        ('blur_images', T(33706, '')),
+                        ('blur_resume_images', T(33707, '')),
                         ('blur_chapters', T(33081, '')),
+                        ('hide_summary', T(33708, '')),
                         ('hide_ratings', T(33705, '')),
                     )
                 ).description(T(33007, "")),

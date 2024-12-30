@@ -957,7 +957,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
             thumb=episode.thumb,
             thumb_opts=self.getThumbnailOpts(episode, hide_spoilers=hide_spoilers),
             thumb_fallback='script.plex/thumb_fallbacks/show.png',
-            info=hide_spoilers and T(33008, '') or episode.summary,
+            info=(hide_spoilers and self.noSummaries and T(33008, '')) or episode.summary,
             background=self.getProperty('background'),
             is_16x9=True,
             video=episode

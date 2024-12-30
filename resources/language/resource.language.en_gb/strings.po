@@ -1835,7 +1835,7 @@ msgid "No TV spoilers"
 msgstr ""
 
 msgctxt "#33007"
-msgid "Select in which cases to blur TV episode thumbnails, previews, redact summaries, hide episode titles and whether to blur chapter images. When the Addon Setting \"Use episode thumbnails in continue hub\" is enabled, blur them as well."
+msgid "Select in which cases to blur TV episode thumbnails, previews, redact summaries, hide episode titles etc."
 msgstr ""
 
 msgctxt "#33008"
@@ -2490,4 +2490,16 @@ msgstr ""
 
 msgctxt "#33705"
 msgid "Hide ratings"
+msgstr ""
+
+msgctxt "#33706"
+msgid "Blur images"
+msgstr ""
+
+msgctxt "#33707"
+msgid "Blur images on home (in progress)"
+msgstr ""
+
+msgctxt "#33708"
+msgid "Hide summaries"
 msgstr ""

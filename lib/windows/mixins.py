@@ -160,13 +160,19 @@ class SpoilersMixin(object):
         self.spoilerSetting = ["unwatched"]
         self.noTitles = False
         self.noRatings = False
+        self.noImages = False
+        self.noResumeImages = False
+        self.noSummaries = False
         self.spoilersAllowedFor = True
         self.cacheSpoilerSettings()
 
     def cacheSpoilerSettings(self):
-        self.spoilerSetting = util.getSetting('no_episode_spoilers3', ["unwatched"])
+        self.spoilerSetting = util.getSetting('no_episode_spoilers4', ['unwatched', 'blur_images', 'hide_summary'])
         self.noTitles = 'no_unwatched_episode_titles' in self.spoilerSetting
         self.noRatings = 'hide_ratings' in self.spoilerSetting
+        self.noImages = 'blur_images' in self.spoilerSetting
+        self.noResumeImages = 'blur_resume_images' in self.spoilerSetting
+        self.noSummaries = 'hide_summary' in self.spoilerSetting
         self.spoilersAllowedFor = util.getSetting('spoilers_allowed_genres2', ["Reality", "Game Show", "Documentary",
                                                                                "Sport"])
 
@@ -231,7 +237,7 @@ class SpoilersMixin(object):
                 (nspoil == 'unwatched' and not watched))
 
     def getThumbnailOpts(self, ep, fully_watched=None, watched=None, hide_spoilers=None):
-        if self.getNoSpoilers(item=ep) == "off":
+        if not self.noImages or self.getNoSpoilers(item=ep) == "off":
             return {}
         return (hide_spoilers if hide_spoilers is not None else
                 self.hideSpoilers(ep, fully_watched=fully_watched, watched=watched)) \
