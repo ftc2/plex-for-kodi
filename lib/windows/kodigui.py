@@ -11,6 +11,7 @@ from six.moves import range
 from six.moves import zip
 
 from .. import util
+from .. import keybind
 
 from plexnet import plexapp
 
@@ -148,13 +149,6 @@ class XMLBase(object):
             raise
         self._onInit()
 
-    def goHomeAction(self, action):
-        if (util.HOME_BUTTON_MAPPED is not None
-                and action.getButtonCode() == int(util.HOME_BUTTON_MAPPED) and hasattr(self, "goHome")):
-            self.goHome(with_root=True)
-            return True
-        return
-
 
 class BaseWindow(XMLBase, xbmcgui.WindowXML, BaseFunctions):
     __slots__ = ("_closing", "_winID", "started", "finishedInit", "dialogProps", "isOpen", "_errored",
@@ -221,10 +215,10 @@ class BaseWindow(XMLBase, xbmcgui.WindowXML, BaseFunctions):
             self.exitCommand = "NODATA"
             self.doClose()
 
+    @keybind.home
+    @keybind.search
     def onAction(self, action):
-        if XMLBase.goHomeAction(self, action):
-            return
-        xbmcgui.WindowXML.onAction(self, action)
+        super().onAction(action)
 
     def onReInit(self):
         pass
@@ -347,11 +341,6 @@ class BaseDialog(XMLBase, xbmcgui.WindowXMLDialog, BaseFunctions):
             self.started = True
             plexapp.util.APP.on('close.dialogs', self.onCloseSignal)
             self.onFirstInit()
-
-    def onAction(self, action):
-        if XMLBase.goHomeAction(self, action):
-            return
-        xbmcgui.WindowXMLDialog.onAction(self, action)
 
     def onFirstInit(self):
         pass
@@ -1054,6 +1043,8 @@ class MultiWindow(object):
     def onReInit(self):
         pass
 
+    @keybind.home
+    @keybind.search
     def onAction(self, action):
         if action == xbmcgui.ACTION_PREVIOUS_MENU or action == xbmcgui.ACTION_NAV_BACK:
             self.doClose()

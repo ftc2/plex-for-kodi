@@ -97,16 +97,21 @@ CURRENT_AR = DISPLAY_RESOLUTION[0] / DISPLAY_RESOLUTION[1]
 # we currently only support vertical scaling for smaller ARs; change to != once we know how to scale horizontally
 NEEDS_SCALING = round(CURRENT_AR, 2) < round(1920 / 1080, 2)
 
+
 HOME_BUTTON_MAPPED = None
-
-
 def homeButtonMapped(*args, **kwargs):
     global HOME_BUTTON_MAPPED
     data = getSetting('map_button_home', None)
-    HOME_BUTTON_MAPPED = data if data != "None" else None
-
-
+    HOME_BUTTON_MAPPED = data if data != 'None' else None
 homeButtonMapped()
+
+
+SEARCH_BUTTON_MAPPED = None
+def searchButtonMapped(*args, **kwargs):
+    global SEARCH_BUTTON_MAPPED
+    data = getSetting('map_button_search', None)
+    SEARCH_BUTTON_MAPPED = data if data != 'None' else None
+searchButtonMapped()
 
 
 class AddonSettings(object):

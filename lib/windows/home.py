@@ -683,6 +683,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
 
         plexapp.util.APP.on('change:selectedServer', self.onSelectedServerChange)
         plexapp.util.APP.on('change:map_button_home', util.homeButtonMapped)
+        plexapp.util.APP.on('change:map_button_search', util.searchButtonMapped)
         plexapp.util.APP.on('loaded:server_connections', self.checkPlexDirectHosts)
         plexapp.util.APP.on('account:response', self.displayServerAndUser)
         plexapp.util.APP.on('sli:reachability:received', self.displayServerAndUser)
@@ -711,6 +712,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
 
         plexapp.util.APP.off('change:selectedServer', self.onSelectedServerChange)
         plexapp.util.APP.off('change:map_button_home', util.homeButtonMapped)
+        plexapp.util.APP.off('change:map_button_search', util.searchButtonMapped)
         plexapp.util.APP.off('loaded:server_connections', self.checkPlexDirectHosts)
         plexapp.util.APP.off('account:response', self.displayServerAndUser)
         plexapp.util.APP.off('sli:reachability:received', self.displayServerAndUser)

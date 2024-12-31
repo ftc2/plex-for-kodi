@@ -23,6 +23,7 @@ from . import dropdown
 from . import kodigui
 from . import playersettings
 from . import optionsdialog
+from .. import keybind
 from .mixins import SpoilersMixin, PlexSubtitleDownloadMixin
 
 KEY_MOVE_SET = frozenset(
@@ -555,6 +556,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
 
         self.updateProgress()
 
+    @keybind.toggle_subtitles
     def onAction(self, action):
         if xbmc.getCondVisibility('Window.IsActive(selectdialog)'):
             if self.doKodiSelectDialogHack(action):

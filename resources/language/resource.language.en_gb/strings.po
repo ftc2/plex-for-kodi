@@ -2155,15 +2155,15 @@ msgid "Analyze"
 msgstr ""
 
 msgctxt "#33085"
-msgid "Map key to home"
+msgid "Home: jump to library home view"
 msgstr ""
 
 msgctxt "#33086"
-msgid "Press the key you want to map to go to home within {} seconds"
+msgid "Press the key you want to bind within {} seconds"
 msgstr ""
 
 msgctxt "#33087"
-msgid "Bind a key to immediately go to the Home view. Cancel using BACK/PREVIOUS_MENU. Clear bound key using the STOP or CONTEXT_MENU (long press OK/Enter) button on the setting."
+msgid "<translation removed>"
 msgstr ""
 
 msgctxt "#33088"
@@ -2534,4 +2534,28 @@ msgstr ""
 
 msgctxt "#33714"
 msgid "Resume in-progress items directly instead of visiting the media."
+msgstr ""
+
+msgctxt "#33715"
+msgid "Key Binds"
+msgstr ""
+
+msgctxt "#33716"
+msgid "[B]Abort[/B]: OK/Back/PreviousMenu during input.[CR][B]Clear bound key[/B]: On the setting, Stop/ContextMenu or long press OK.[CR][B]Troubleshooting[/B]: If there's a conflict with the native Kodi keymap, fix it by creating a userdata keymap. Map this key to 'noop' action in the appropriate context (try 'global')."
+msgstr ""
+
+msgctxt "#33717"
+msgid "Search library"
+msgstr ""
+
+msgctxt "#33718"
+msgid "Toggle subtitles on/off (default: t)"
+msgstr ""
+
+msgctxt "#33719"
+msgid "Cycle to next subtitle track (default: l)"
+msgstr ""
+
+msgctxt "#33720"
+msgid "Subtitle selection dialog"
 msgstr ""

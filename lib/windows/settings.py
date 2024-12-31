@@ -692,7 +692,12 @@ class Settings(object):
                 ).description(
                     T(33033, "When path mapping is active for a library, display an indicator.")
                 ),
-                KeySetting('map_button_home', T(33085), None).description(T(33087))
+            )
+        ),
+        'key_binds': (
+            T(33715, 'Key Binds'), (
+                KeySetting('map_button_home', T(33085), None).description(T(33716)),
+                KeySetting('map_button_search', T(33717), None).description(T(33716)),
             )
         ),
         'player': (
@@ -932,10 +937,10 @@ class Settings(object):
                 BoolSetting('dump_config', T(33642, 'Debug Logging'), False).description(T(33643)),
             )
         ),
-        'privacy': (
-            T(32051, 'Privacy'),
-            ()
-        ),
+        # 'privacy': (
+        #     T(32051, 'Privacy'),
+        #     ()
+        # ),
         'about': (
             T(32052, 'About'), (
                 InfoSetting('addon_version', T(32054, 'Addon Version'), util.ADDON.getAddonInfo('version')),
@@ -957,7 +962,7 @@ class Settings(object):
         ),
     }
 
-    SECTION_IDS = ('main', 'video', 'audio', 'ui', 'player', 'player_user', 'network', 'system', 'about')
+    SECTION_IDS = tuple(section for section in SETTINGS)
 
     def __getitem__(self, key):
         return self.SETTINGS[key]
