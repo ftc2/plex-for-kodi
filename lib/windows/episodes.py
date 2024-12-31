@@ -1277,7 +1277,8 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
                 methods.append(("setLabel", tit))
 
             if "summary" in types:
-                properties["summary"] = hide_spoilers and T(33008, '') or video.summary.strip().replace('\t', ' ')
+                properties["summary"] = ((hide_spoilers and self.noSummaries and T(33008, '')) or
+                                         video.summary.strip().replace('\t', ' '))
 
             if "thumbnail" in types:
                 methods.append(("setThumbnailImage",
