@@ -625,6 +625,9 @@ class Settings(object):
                         ('movies', T(32348, 'Movies')),
                     ]
                 ),
+                BoolSetting(
+                    'show_reviews', T(33710, ''), True
+                ),
                 MultiOptionsSetting(
                     'no_episode_spoilers4', T(33006, ''),
                     ['unwatched', 'blur_images', 'hide_summary'],

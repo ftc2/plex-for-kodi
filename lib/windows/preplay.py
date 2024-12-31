@@ -700,7 +700,7 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
         items = []
         idx = 0
 
-        if not self.video.reviews:
+        if not util.getSetting('show_reviews', True) or not self.video.reviews:
             self.reviewsListControl.reset()
             return False
 

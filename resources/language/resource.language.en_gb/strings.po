@@ -2507,3 +2507,7 @@ msgstr ""
 msgctxt "#33709"
 msgid "Show ratings for"
 msgstr ""
+
+msgctxt "#33710"
+msgid "Show reviews"
+msgstr ""

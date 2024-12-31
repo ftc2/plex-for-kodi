@@ -3096,3 +3096,7 @@ msgstr "Zusammenfassungen verstecken"
 msgctxt "#33709"
 msgid "Show ratings for"
 msgstr "Bewertungen anzeigen für"
+
+msgctxt "#33710"
+msgid "Show reviews"
+msgstr "Kritiken anzeigen"
