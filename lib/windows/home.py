@@ -1200,6 +1200,11 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
         if mli.dataSource is None:
             return
 
+        # auto resume for in-progress items
+        if util.getSetting('home_inprogress_resume', True):
+            if mli.dataSource.TYPE in ('episode', 'movie') and mli.dataSource.in_progress:
+                auto_play = True
+
         carryProps = None
         if auto_play:
             carryProps = self.carriedProps
@@ -1490,6 +1495,12 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
                     options.append({'key': 'remove_cw', 'display': T(33662, "Remove from Continue Watching")})
                     if not has_mp:
                         select_base = 1
+                if util.getSetting('home_inprogress_resume', True) and mli.dataSource.in_progress:
+                    # this is an in progress item that would be auto resumed; add specific entry to visit media instead
+                    options.insert(0, dropdown.SEPARATOR)
+                    options.insert(0, {'key': 'to_item', 'display': T(33019, "Visit media item")})
+                    select_base = 0
+
 
             if mli.dataSource.TYPE in ('episode', 'season'):
                 options.append(dropdown.SEPARATOR)
@@ -1559,6 +1570,15 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver, SpoilersMixin):
             target = mli.dataSource.show() if choice["key"] == "to_show" else mli.dataSource.season()
             try:
                 command = opener.open(target, dialog_props=self.carriedProps)
+                if command == "NODATA":
+                    raise util.NoDataException
+            except util.NoDataException:
+                util.ERROR("No data - disconnected?", notify=True, time_ms=5000)
+                return
+
+        elif choice["key"] == "to_item":
+            try:
+                command = opener.open(mli.dataSource, dialog_props=self.carriedProps)
                 if command == "NODATA":
                     raise util.NoDataException
             except util.NoDataException:

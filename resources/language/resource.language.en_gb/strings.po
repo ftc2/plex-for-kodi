@@ -2527,3 +2527,11 @@ msgstr ""
 msgctxt "#33712"
 msgid "When playback of an in-progress media is requested, resume it by default instead of asking whether to resume or start from the beginning."
 msgstr ""
+
+msgctxt "#33713"
+msgid "Home: Resume in-progress items"
+msgstr ""
+
+msgctxt "#33714"
+msgid "Resume in-progress items directly instead of visiting the media."
+msgstr ""

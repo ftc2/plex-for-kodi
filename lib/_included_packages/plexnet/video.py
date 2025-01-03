@@ -566,6 +566,10 @@ class PlayableVideo(Video, media.RelatedMixin):
             hubs[hub.hubIdentifier] = hub
         return hubs
 
+    @property
+    def in_progress(self):
+        return bool(self.get('viewOffset').asInt())
+
 
 @plexobjects.registerLibType
 class Movie(PlayableVideo):
@@ -835,10 +839,6 @@ class Episode(PlayableVideo, SectionOnDeckMixin):
     @property
     def isFullyWatched(self):
         return self.get('viewCount').asInt() > 0 and not self.get('viewOffset').asInt()
-
-    @property
-    def inProgress(self):
-        return bool(self.get('viewOffset').asInt())
 
     @property
     def playbackSettings(self):

@@ -452,6 +452,11 @@ class Settings(object):
                     T(33712, 'When playback of an in-progress media is requested, resume it by default instead'
                              ' of asking whether to resume or start from the beginning.')
                 ),
+                BoolSetting(
+                    'home_inprogress_resume', T(33713, 'Home: Resume in-progress items'), True
+                ).description(
+                    T(33714, 'Resume in-progress items directly instead of visiting the media.')
+                ),
             )
         ),
         'video': (
