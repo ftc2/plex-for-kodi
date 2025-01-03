@@ -1353,7 +1353,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
                 mli.setProperty('audio', sas and sas.getTitle(metadata.apiTranslate) or T(32309, 'None'))
 
         sss = video.selectedSubtitleStream(forced_subtitles_override=
-                                           util.getSetting("forced_subtitles_override", False),
+                                           util.getSetting("forced_subtitles_override", False) and pnUtil.ACCOUNT.subtitlesForced == 0,
                                            deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
         if sss:
             if len(video.subtitleStreams) > 1:

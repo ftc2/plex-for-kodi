@@ -160,7 +160,7 @@ class ShowWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMixin, 
         self.setProperty('audio', sas and sas.getTitle() or 'None')
 
         sss = self.mediaItem.selectedSubtitleStream(
-            forced_subtitles_override=pnUtil.ACCOUNT.subtitlesForced in (0, 3),
+            forced_subtitles_override=util.getSetting("forced_subtitles_override", False) and pnUtil.ACCOUNT.subtitlesForced == 0,
             deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
         self.setProperty('subtitles', sss and sss.getTitle() or 'None')
 

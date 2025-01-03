@@ -1286,6 +1286,11 @@ msgctxt "#32492"
 msgid "Kodi Subtitle Settings"
 msgstr "Kodi-Untertiteleinstellungen"
 
+#:
+msgctxt "#32493"
+msgid "When a media file has a forced/foreign subtitle for a subtitle-enabled language, the Plex Media Server preselects it. This behaviour is usually not necessary and not configurable. This setting fixes that by ignoring the PMSs decision and selecting the same language without a forced flag if possible."
+msgstr "Hat eine Mediendatei erzwungenge Untertitel für eine Sprache, bei der Untertitel erwünscht sind, wählt der Plex Media Server diesen standardmäßig aus. Das Verhalten ist normalerweise unerwünscht und nicht konfigurierbar. Diese Einstellung behebt das Problem, indem versucht wird, einen Untertitel der selben Sprache ohne Erzwungen-Markierung zu wählen."
+
 #: 
 msgctxt "#32495"
 msgid "Skip intro"
@@ -1953,6 +1958,11 @@ msgstr "Benutzerspezifisch.\n"
 msgctxt "#32940"
 msgid "Video Player"
 msgstr "Video-Player"
+
+#:
+msgctxt "#32941"
+msgid "Forced subtitles fix"
+msgstr "Erzwungene Untertitel beheben"
 
 #: 
 msgctxt "#32942"

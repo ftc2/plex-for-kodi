@@ -609,7 +609,7 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
                 self.setProperty('audio', sas and sas.getTitle(metadata.apiTranslate) or T(32309, 'None'))
 
         sss = self.video.selectedSubtitleStream(
-            forced_subtitles_override=pnUtil.ACCOUNT.subtitlesForced in (0, 3),
+            forced_subtitles_override=util.getSetting("forced_subtitles_override", False) and pnUtil.ACCOUNT.subtitlesForced == 0,
             deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
         if sss:
             if len(self.video.subtitleStreams) > 1:

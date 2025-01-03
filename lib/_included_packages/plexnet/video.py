@@ -522,7 +522,7 @@ class PlayableVideo(Video, media.RelatedMixin):
                     subtitleStream = self.selectedSubtitleStream(ref=None, force_from_plex=forceSubtitlesFromPlex)
                 else:
                     subtitleStream = self.selectedSubtitleStream(fallback=False,
-                                                                 forced_subtitles_override=util.ACCOUNT.subtitlesForced in (0, 3),
+                                                                 forced_subtitles_override=self.settings.getPreference("forced_subtitles_override", False) and util.ACCOUNT.subtitlesForced == 0,
                                                                  deselect_subtitles=self.settings.getPreference("disable_subtitle_languages", []))
                 videoStream = self.selectedVideoStream(fallback=True)
                 audioStream = self.selectedAudioStream(fallback=True)
