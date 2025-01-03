@@ -3110,3 +3110,11 @@ msgstr "Bewertungen anzeigen für"
 msgctxt "#33710"
 msgid "Show reviews"
 msgstr "Kritiken anzeigen"
+
+msgctxt "#33711"
+msgid "Always resume media"
+msgstr "Medien immer fortsetzen"
+
+msgctxt "#33712"
+msgid "When playback of an in-progress media is requested, resume it by default instead of asking whether to resume or start from the beginning."
+msgstr "Bei einem bereits begonnenen Medium nicht fragen, ob es fortgesetzt oder vom Start abgespielt werden soll."

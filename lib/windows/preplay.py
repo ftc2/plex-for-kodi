@@ -468,22 +468,25 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
 
         resume = False
         if self.video.viewOffset.asInt():
-            choice = dropdown.showDropdown(
-                options=[
-                    {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(util.timeDisplay(self.video.viewOffset.asInt()).lstrip('0').lstrip(':'))},
-                    {'key': 'play', 'display': T(32317, 'Play from beginning')}
-                ],
-                pos=(660, 441),
-                close_direction='none',
-                set_dropdown_prop=False,
-                header=T(32314, 'In Progress'),
-                dialog_props=from_auto_play and self.dialogProps or None
-            )
+            if not util.getSetting('assume_resume', True):
+                choice = dropdown.showDropdown(
+                    options=[
+                        {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(util.timeDisplay(self.video.viewOffset.asInt()).lstrip('0').lstrip(':'))},
+                        {'key': 'play', 'display': T(32317, 'Play from beginning')}
+                    ],
+                    pos=(660, 441),
+                    close_direction='none',
+                    set_dropdown_prop=False,
+                    header=T(32314, 'In Progress'),
+                    dialog_props=from_auto_play and self.dialogProps or None
+                )
 
-            if not choice:
-                return
+                if not choice:
+                    return
 
-            if choice['key'] == 'resume':
+                if choice['key'] == 'resume':
+                    resume = True
+            else:
                 resume = True
 
         if not from_auto_play:

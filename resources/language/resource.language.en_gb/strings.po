@@ -2519,3 +2519,11 @@ msgstr ""
 msgctxt "#33710"
 msgid "Show reviews"
 msgstr ""
+
+msgctxt "#33711"
+msgid "Always resume media"
+msgstr ""
+
+msgctxt "#33712"
+msgid "When playback of an in-progress media is requested, resume it by default instead of asking whether to resume or start from the beginning."
+msgstr ""

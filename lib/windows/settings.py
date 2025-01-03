@@ -445,7 +445,13 @@ class Settings(object):
                         "Set this to the same value as your Plex server (Settings>Library>Video played threshold) to av"
                         "oid certain pitfalls, Default: 90 %"
                     )
-                )
+                ),
+                BoolSetting(
+                    'assume_resume', T(33711, 'Always resume media'), True
+                ).description(
+                    T(33712, 'When playback of an in-progress media is requested, resume it by default instead'
+                             ' of asking whether to resume or start from the beginning.')
+                ),
             )
         ),
         'video': (

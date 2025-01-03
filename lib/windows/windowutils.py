@@ -49,24 +49,28 @@ class UtilMixin():
         if in_progress:
             n = in_progress[0]
             pl.setCurrent(n)
-            choice = dropdown.showDropdown(
-                options=[
-                    {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(
-                        util.timeDisplay(n.viewOffset.asInt()).lstrip('0').lstrip(':'))},
-                    {'key': 'play', 'display': T(32317, 'Play from beginning')}
-                ],
-                pos=(660, 441),
-                close_direction='none',
-                set_dropdown_prop=False,
-                header=u'{0} - {1} \u2022 {2}'.format(title,
-                                                      T(32310, 'S').format(n.parentIndex),
-                                                      T(32311, 'E').format(n.index))
-            )
 
-            if not choice:
-                return None
+            if not util.getSetting('assume_resume', True):
+                choice = dropdown.showDropdown(
+                    options=[
+                        {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(
+                            util.timeDisplay(n.viewOffset.asInt()).lstrip('0').lstrip(':'))},
+                        {'key': 'play', 'display': T(32317, 'Play from beginning')}
+                    ],
+                    pos=(660, 441),
+                    close_direction='none',
+                    set_dropdown_prop=False,
+                    header=u'{0} - {1} \u2022 {2}'.format(title,
+                                                          T(32310, 'S').format(n.parentIndex),
+                                                          T(32311, 'E').format(n.index))
+                )
 
-            if choice['key'] == 'resume':
+                if not choice:
+                    return None
+
+                if choice['key'] == 'resume':
+                    return True
+            else:
                 return True
             return False
 
