@@ -983,6 +983,7 @@ class SettingsWindow(kodigui.BaseWindow, windowutils.UtilMixin):
         self.showSections()
         self.setFocusId(75)
         self.lastSection = None
+        self.lastFocusID = None
         self.checkSection()
 
     def onAction(self, action):
@@ -1002,8 +1003,13 @@ class SettingsWindow(kodigui.BaseWindow, windowutils.UtilMixin):
                 # elif not xbmc.getCondVisibility('ControlGroup({0}).HasFocus(0)'.format(self.TOP_GROUP_ID)):
                 #     self.setFocusId(self.TOP_GROUP_ID)
                 #     return
-            elif action == xbmcgui.ACTION_MOVE_RIGHT and controlID == 150:
-                self.editSetting(from_right=True)
+            elif action == xbmcgui.ACTION_MOVE_RIGHT:
+                if self.lastFocusID == self.SECTION_LIST_ID:
+                    self.setFocusId(self.SETTINGS_LIST_ID)
+                    return
+                elif self.lastFocusID == self.SETTINGS_LIST_ID:
+                    self.editSetting(from_right=True)
+                    return
         except:
             util.ERROR()
 
@@ -1020,6 +1026,9 @@ class SettingsWindow(kodigui.BaseWindow, windowutils.UtilMixin):
             self.doClose()
         elif controlID == self.PLAYER_STATUS_BUTTON_ID:
             self.showAudioPlayer()
+
+    def onFocus(self, controlID):
+        self.lastFocusID = controlID
 
     def checkSection(self):
         mli = self.sectionList.getSelectedItem()
