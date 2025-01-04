@@ -36,7 +36,7 @@ from .kodi_util import (ADDON, xbmc, xbmcvfs, xbmcaddon, xbmcgui, translatePath,
                         KODI_BUILD_NUMBER, FROM_KODI_REPOSITORY)
 from .properties import setGlobalProperty, setGlobalBoolProperty, waitForGPEmpty, waitForConsumption, getGlobalProperty
 # noinspection PyUnresolvedReferences
-from .settings_util import getSetting, getUserSetting, setSetting, USER_SETTINGS, JSON_SETTINGS
+from .settings_util import getSetting, getUserSetting, setSetting, USER_SETTINGS, JSON_SETTINGS, DEFAULT_SETTINGS
 from .monitor import MONITOR
 
 

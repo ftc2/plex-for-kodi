@@ -98,6 +98,7 @@ class BasicSetting(Setting):
         self.desc = desc
         self.isThemeRelevant = theme_relevant
         self.backport_from = backport_from
+        util.DEFAULT_SETTINGS[ID] = default
 
     def description(self, desc):
         self.desc = desc

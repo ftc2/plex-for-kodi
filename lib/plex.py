@@ -24,6 +24,9 @@ else:
     _Event = threading.Event
 
 
+UNDEF = "__UNDEF__"
+
+
 class PlexTimer(plexapp.util.Timer):
     def shouldAbort(self):
         return util.MONITOR.abortRequested()
@@ -124,7 +127,7 @@ class PlexInterface(plexapp.AppInterface):
 
     bingeModeManager = None
 
-    def getPreference(self, pref, default=None):
+    def getPreference(self, pref, default=UNDEF):
         if pref == 'manual_connections':
             return self.getManualConnections()
         else:
@@ -327,6 +330,7 @@ if util.addonSettings.useCertBundle != "system":
     util.LOG("Using certificate bundle: {}".format(util.addonSettings.useCertBundle))
     plexnet_util.USE_CERT_BUNDLE = util.addonSettings.useCertBundle
 plexnet_util.translatePath = util.translatePath
+plexnet_util.DEFAULT_SETTINGS = util.DEFAULT_SETTINGS
 
 
 class CallbackEvent(plexapp.util.CompatEvent):

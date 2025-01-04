@@ -7,9 +7,11 @@ import json
 
 from lib.kodi_util import ADDON
 
+UNDEF = "__UNDEF__"
 SETTINGS_LOCK = threading.Lock()
 JSON_SETTINGS = []
 USER_SETTINGS = []
+DEFAULT_SETTINGS = {}
 
 
 def _processSetting(setting, default, is_json=False):
@@ -34,26 +36,34 @@ def _processSetting(setting, default, is_json=False):
     return setting
 
 
+def _getDef(key, default):
+    if default == UNDEF:
+        default = DEFAULT_SETTINGS.get(key, None)
+    return default
 
-def getSetting(key, default=None):
+
+def getSetting(key, default=UNDEF):
+    d = _getDef(key, default)
+
     with SETTINGS_LOCK:
         setting = ADDON.getSetting(key)
         is_json = key in JSON_SETTINGS
-        return _processSetting(setting, default, is_json=is_json)
+        return _processSetting(setting, d, is_json=is_json)
 
 
-def getUserSetting(key, default=None):
+def getUserSetting(key, default=UNDEF):
     from plexnet.util import ACCOUNT
+    d = _getDef(key, default)
 
     if not ACCOUNT:
-        return default
+        return d
 
     is_json = key in JSON_SETTINGS
 
     key = '{}.{}'.format(key, ACCOUNT.ID)
     with SETTINGS_LOCK:
         setting = ADDON.getSetting(key)
-        return _processSetting(setting, default, is_json=is_json)
+        return _processSetting(setting, d, is_json=is_json)
 
 
 def setSetting(key, value, addon=ADDON):
