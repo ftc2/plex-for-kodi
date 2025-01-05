@@ -216,7 +216,7 @@ class SeekPlayerHandler(BasePlayerHandler):
         self.skipPostPlay = False
         self.prePlayWitnessed = False
         self.queuingNext = False
-        self.useAlternateSeek = util.isCoreELEC and util.getSetting('use_alternate_seek', True)
+        self.useAlternateSeek = util.isCoreELEC and util.getSetting('use_alternate_seek')
         self.useResumeFix = self.useAlternateSeek
         self.reset()
 
@@ -748,8 +748,8 @@ class SeekPlayerHandler(BasePlayerHandler):
 
         subs = self.player.video.selectedSubtitleStream(
             forced_subtitles_override=honor_forced_subtitles_override and util.getSetting("forced_subtitles_override",
-                                                                                          False) and plexnetUtil.ACCOUNT.subtitlesForced == 0,
-            deselect_subtitles=honor_deselect_subtitles and util.getSetting("disable_subtitle_languages", []) or [],
+                                                                                         ) and plexnetUtil.ACCOUNT.subtitlesForced == 0,
+            deselect_subtitles=honor_deselect_subtitles and util.getSetting("disable_subtitle_languages") or [],
             ref=ref
         )
 

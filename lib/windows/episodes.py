@@ -313,7 +313,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
     def onFirstInit(self):
         self._onFirstInit()
 
-        if self.show_ and self.show_.theme and not util.getSetting("slow_connection", False) and \
+        if self.show_ and self.show_.theme and not util.getSetting("slow_connection") and \
                 (not self.cameFrom or self.cameFrom not in (self.show_.ratingKey, "postplay")) and \
                 not self.openedWithAutoPlay:
             volume = self.show_.settings.getThemeMusicValue()
@@ -986,7 +986,7 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
 
         resume = False
         if episode.viewOffset.asInt():
-            if not util.getSetting('assume_resume', True):
+            if not util.getSetting('assume_resume'):
                 choice = dropdown.showDropdown(
                     options=[
                         {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(util.timeDisplay(episode.viewOffset.asInt()).lstrip('0').lstrip(':'))},
@@ -1356,8 +1356,8 @@ class EpisodesWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMix
                 mli.setProperty('audio', sas and sas.getTitle(metadata.apiTranslate) or T(32309, 'None'))
 
         sss = video.selectedSubtitleStream(forced_subtitles_override=
-                                           util.getSetting("forced_subtitles_override", False) and pnUtil.ACCOUNT.subtitlesForced == 0,
-                                           deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
+                                           util.getSetting("forced_subtitles_override") and pnUtil.ACCOUNT.subtitlesForced == 0,
+                                           deselect_subtitles=util.getSetting("disable_subtitle_languages"))
         if sss:
             if len(video.subtitleStreams) > 1:
                 mli.setProperty(

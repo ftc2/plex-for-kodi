@@ -592,7 +592,7 @@ class LibraryWindow(mixins.PlaybackBtnMixin, kodigui.MultiWindow, windowutils.Ut
             )
 
             if choice and choice["key"] in ("mark_watched", "mark_unwatched"):
-                if util.getSetting('home_confirm_actions', True):
+                if util.getSetting('home_confirm_actions'):
                     button = optionsdialog.show(
                         T(32319, "Mark Played") if choice["key"] == "mark_watched" else T(32318, "Mark Unplayed"),
                         label,

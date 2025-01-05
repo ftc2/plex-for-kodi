@@ -98,7 +98,7 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
     def onReInit(self):
         PlaybackBtnMixin.onReInit(self)
         self.initialized = False
-        if util.getSetting("slow_connection", False):
+        if util.getSetting("slow_connection"):
             self.progressImageControl.setWidth(1)
             self.setProperty('remainingTime', T(32914, "Loading"))
         self.video.reload(checkFiles=1, fromMediaChoice=self.video.mediaChoice is not None, **VIDEO_RELOAD_KW)
@@ -468,7 +468,7 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
 
         resume = False
         if self.video.viewOffset.asInt():
-            if not util.getSetting('assume_resume', True):
+            if not util.getSetting('assume_resume'):
                 choice = dropdown.showDropdown(
                     options=[
                         {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(util.timeDisplay(self.video.viewOffset.asInt()).lstrip('0').lstrip(':'))},
@@ -612,8 +612,8 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
                 self.setProperty('audio', sas and sas.getTitle(metadata.apiTranslate) or T(32309, 'None'))
 
         sss = self.video.selectedSubtitleStream(
-            forced_subtitles_override=util.getSetting("forced_subtitles_override", False) and pnUtil.ACCOUNT.subtitlesForced == 0,
-            deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
+            forced_subtitles_override=util.getSetting("forced_subtitles_override") and pnUtil.ACCOUNT.subtitlesForced == 0,
+            deselect_subtitles=util.getSetting("disable_subtitle_languages"))
         if sss:
             if len(self.video.subtitleStreams) > 1:
                 self.setProperty(
@@ -703,7 +703,7 @@ class PrePlayWindow(kodigui.ControlledWindow, windowutils.UtilMixin, RatingsMixi
         items = []
         idx = 0
 
-        if not util.getSetting('show_reviews', True) or not self.video.reviews:
+        if not util.getSetting('show_reviews') or not self.video.reviews:
             self.reviewsListControl.reset()
             return False
 

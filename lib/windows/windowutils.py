@@ -50,7 +50,7 @@ class UtilMixin():
             n = in_progress[0]
             pl.setCurrent(n)
 
-            if not util.getSetting('assume_resume', True):
+            if not util.getSetting('assume_resume'):
                 choice = dropdown.showDropdown(
                     options=[
                         {'key': 'resume', 'display': T(32429, 'Resume from {0}').format(

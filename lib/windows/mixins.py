@@ -132,11 +132,11 @@ class RatingsMixin(object):
         if hide_ratings:
             return
 
-        if video.TYPE == "movie" and "movies" not in util.getSetting("show_ratings", ["series", "movies"]):
+        if video.TYPE == "movie" and "movies" not in util.getSetting("show_ratings"):
             return
 
-        if ((video.TYPE in ("episode", "show", "season")) and
-                "series" not in util.getSetting("show_ratings", ["series", "movies"])):
+        if (video.TYPE in ("episode", "show", "season") and
+                "series" not in util.getSetting("show_ratings")):
             return
 
         audienceRating = video.audienceRating
@@ -174,14 +174,13 @@ class SpoilersMixin(object):
         self.cacheSpoilerSettings()
 
     def cacheSpoilerSettings(self):
-        self.spoilerSetting = util.getSetting('no_episode_spoilers4', ['unwatched', 'blur_images', 'hide_summary'])
+        self.spoilerSetting = util.getSetting('no_episode_spoilers4')
         self.noTitles = 'no_unwatched_episode_titles' in self.spoilerSetting
         self.noRatings = 'hide_ratings' in self.spoilerSetting
         self.noImages = 'blur_images' in self.spoilerSetting
         self.noResumeImages = 'blur_resume_images' in self.spoilerSetting
         self.noSummaries = 'hide_summary' in self.spoilerSetting
-        self.spoilersAllowedFor = util.getSetting('spoilers_allowed_genres2', ["Reality", "Game Show", "Documentary",
-                                                                               "Sport"])
+        self.spoilersAllowedFor = util.getSetting('spoilers_allowed_genres2')
 
     @property
     def noSpoilers(self):

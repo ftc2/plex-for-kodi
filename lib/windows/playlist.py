@@ -212,7 +212,7 @@ class PlaylistWindow(kodigui.ControlledWindow, windowutils.UtilMixin):
             elif self.playlist.playlistType == 'video':
                 if not util.addonSettings.playlistVisitMedia or play:
                     if resume is None and mli and bool(mli.dataSource.viewOffset.asInt()):
-                        if not util.getSetting('assume_resume', True):
+                        if not util.getSetting('assume_resume'):
                             return self.plItemPlaybackMenu(select_choice='resume')
                         resume = True
 

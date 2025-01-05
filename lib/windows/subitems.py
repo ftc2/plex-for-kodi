@@ -100,7 +100,7 @@ class ShowWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMixin, 
     def onInit(self, *args, **kwargs):
         super(ShowWindow, self).onInit(*args, **kwargs)
         if self.mediaItem.theme and (not self.cameFrom or self.cameFrom != self.mediaItem.ratingKey) \
-                and not util.getSetting("slow_connection", False):
+                and not util.getSetting("slow_connection"):
             self.cameFrom = self.mediaItem.ratingKey
             volume = self.mediaItem.settings.getThemeMusicValue()
             if volume > 0:
@@ -160,8 +160,8 @@ class ShowWindow(kodigui.ControlledWindow, windowutils.UtilMixin, SeasonsMixin, 
         self.setProperty('audio', sas and sas.getTitle() or 'None')
 
         sss = self.mediaItem.selectedSubtitleStream(
-            forced_subtitles_override=util.getSetting("forced_subtitles_override", False) and pnUtil.ACCOUNT.subtitlesForced == 0,
-            deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
+            forced_subtitles_override=util.getSetting("forced_subtitles_override") and pnUtil.ACCOUNT.subtitlesForced == 0,
+            deselect_subtitles=util.getSetting("disable_subtitle_languages"))
         self.setProperty('subtitles', sss and sss.getTitle() or 'None')
 
         leafcount = self.mediaItem.leafCount.asFloat()

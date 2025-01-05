@@ -191,9 +191,9 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
         self._ignoreInput = False
         self._ignoreTick = False
         self._abortBufferWait = False
-        self.no_spoilers = util.getSetting('no_episode_spoilers4', ['unwatched', 'blur_images', 'hide_summary'])
-        self.no_time_no_osd_spoilers = util.getSetting('no_osd_time_spoilers', False)
-        self.clientLikePlex = util.getSetting('player_official', True)
+        self.no_spoilers = util.getSetting('no_episode_spoilers4')
+        self.no_time_no_osd_spoilers = util.getSetting('no_osd_time_spoilers')
+        self.clientLikePlex = util.getSetting('player_official')
 
         self._videoBelowOneHour = False
         self.timeFmtKodi = util.timeFormatKN
@@ -204,11 +204,11 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
         self.timeKeeper = None
         self.timeKeeperTime = None
         self.idleTime = None
-        self.stopPlaybackOnIdle = util.getSetting('player_stop_on_idle', 0)
-        self.resumeSeekBehind = util.getSetting('resume_seek_behind', 0)
-        self.resumeSeekBehindPause = util.getSetting('resume_seek_behind_pause', False)
-        self.resumeSeekBehindAfter = util.getSetting('resume_seek_behind_after', 0) / 1000.0
-        self.resumeSeekBehindOnlyDP = util.getSetting('resume_seek_behind_onlydp', True)
+        self.stopPlaybackOnIdle = util.getSetting('player_stop_on_idle')
+        self.resumeSeekBehind = util.getSetting('resume_seek_behind')
+        self.resumeSeekBehindPause = util.getSetting('resume_seek_behind_pause')
+        self.resumeSeekBehindAfter = util.getSetting('resume_seek_behind_after') / 1000.0
+        self.resumeSeekBehindOnlyDP = util.getSetting('resume_seek_behind_onlydp')
         self.pausedAt = None
         self.isDirectPlay = True
         self.isTranscoded = False
@@ -433,7 +433,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
         self.setBoolProperty('nav.repeat', showRepeat)
         self.setBoolProperty('nav.ffwdrwd', showFfwdRwd)
         self.setBoolProperty('nav.shuffle', showShuffle)
-        navPlaylist = util.getSetting('video_show_playlist', 'eponly')
+        navPlaylist = util.getSetting('video_show_playlist')
         self.setBoolProperty('nav.playlist', (navPlaylist == "eponly" and
                                               (self.player.video.type == 'episode' or self.handler.playlist)) or
                              navPlaylist == "always")
@@ -441,7 +441,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
         if not self.getProperty('nav.playlist'):
             self.subtitleButtonLeft += self.NAVBAR_BTN_SIZE
 
-        navPrevNext = util.getSetting('video_show_prevnext', 'eponly')
+        navPrevNext = util.getSetting('video_show_prevnext')
         self.setBoolProperty('nav.prevnext', (navPrevNext == "eponly" and
                                               (self.player.video.type == 'episode' or self.handler.playlist)) or
                              navPrevNext == "always")
@@ -1221,10 +1221,10 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
             self.initialVideoSettings = dict(self.player.video.settings.prefOverrides)
             self.initialAudioStream = self.player.video.selectedAudioStream()
 
-        sss = self.player.video.selectedSubtitleStream(deselect_subtitles=util.getSetting("disable_subtitle_languages", []))
+        sss = self.player.video.selectedSubtitleStream(deselect_subtitles=util.getSetting("disable_subtitle_languages"))
         if sss != self.initialSubtitleStream:
             util.DEBUG_LOG("Subtitle changed from {} to {} (deselect: {})", self.initialSubtitleStream, sss,
-                           util.getSetting("disable_subtitle_languages", []))
+                           util.getSetting("disable_subtitle_languages"))
             self.initialSubtitleStream = sss
             changed.subtitle = True
             if self.isTranscoded:
@@ -1337,7 +1337,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
 
         if choice['key'] == 'download':
             self.hideOSD()
-            subs_dl_source = util.getSetting('subtitle_download_from', 'plex')
+            subs_dl_source = util.getSetting('subtitle_download_from')
             if subs_dl_source == 'ask':
                 button = optionsdialog.show(
                     T(33693, 'Download subtitles using'),
@@ -1359,14 +1359,14 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
                     self.setSubtitles(honor_forced_subtitles_override=False,
                                       honor_deselect_subtitles=False, ref=None)
                 elif downloaded is None:
-                    if util.getSetting('subtitle_download_fallback', True):
+                    if util.getSetting('subtitle_download_fallback'):
                         subs_dl_source = 'kodi'
                 if was_playing and self.player.playState == self.player.STATE_PAUSED:
                     self.player.pause()
 
             if subs_dl_source == 'kodi':
                 if self.handler and self.handler.player and self.handler.player.playerObject \
-                        and util.getSetting('calculate_oshash', False):
+                        and util.getSetting('calculate_oshash'):
                     meta = self.handler.player.playerObject.metadata
                     if not meta.size:
                         util.LOG("Can't calculate OpenSubtitles hash because we're transcoding")
@@ -2076,7 +2076,7 @@ class SeekDialog(kodigui.BaseDialog, PlexSubtitleDownloadMixin):
         util.DEBUG_LOG("SeekDialog: OnAVChange: DPO: {0}, offset: {1}", self.DPPlayerOffset, self.offset)
 
         # wait for buffer if we're not expecting a seek
-        if not self.handler.seekOnStart and util.getSetting("slow_connection", False) and not self.waitingForBuffer:
+        if not self.handler.seekOnStart and util.getSetting("slow_connection") and not self.waitingForBuffer:
             # fixme: not sure why this is necessary, but something breaks when playing back a next item from playback
             #        that doesn't have a seek value. Adding a slight delay here fixes that. Timing issue?
             xbmc.sleep(100)

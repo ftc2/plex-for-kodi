@@ -103,7 +103,7 @@ def _main():
     #pr.enable()
 
     util.DEBUG_LOG('[ STARTED: {0} -------------------------------------------------------------------- ]', util.ADDON.getAddonInfo('version'))
-    if util.KODI_VERSION_MAJOR > 19 and util.DEBUG and util.getSetting('dump_config', False):
+    if util.KODI_VERSION_MAJOR > 19 and util.DEBUG and util.getSetting('dump_config'):
         lv = len(util.ADDON.getAddonInfo('version'))
         util.DEBUG_LOG('[ SETTINGS DUMP {0}-------------------------------------------------------------------- '
                        ']', (lv - 4)*'-')
